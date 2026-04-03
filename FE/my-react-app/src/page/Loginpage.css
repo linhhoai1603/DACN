@@ -4,7 +4,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    /*min-height: 100vh;*/
     background-color: #f8fafc;
     padding: 20px;
 }
@@ -29,6 +29,19 @@
     display: flex;
     align-items: center;
     gap: 30px;
+}
+
+.help-link {
+    text-decoration: none;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.3s;
+    line-height: 1; /* Đảm bảo không có khoảng cách thừa bên dưới chữ */
+}
+
+.help-link:hover {
+    color: #2C3E5D;
 }
 
 .btn-signup-header {
@@ -109,4 +122,34 @@
 .input-field:focus {
     border-color: #4A5D7E;
     background: #fff;
+}
+/* Nút Sign In chính */
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background-color: #4A5D7E; /* Màu xanh Navy đồng bộ với bên trái */
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+
+    /* Hiệu ứng đổ bóng để nút trông nổi khối */
+    box-shadow: 0 10px 20px rgba(74, 93, 126, 0.2);
+
+    /* Hiệu ứng mượt mà khi hover */
+    transition: all 0.3s ease;
+    display: block; /* Đảm bảo nút chiếm hết chiều ngang form */
+}
+
+.btn-submit:hover {
+    background-color: #3b4b66; /* Đậm hơn một chút */
+    transform: translateY(-2px); /* Nhích nhẹ lên tạo cảm giác nhấn được */
+    box-shadow: 0 12px 24px rgba(74, 93, 126, 0.3);
+}
+
+.btn-submit:active {
+    transform: translateY(0); /* Nhấn xuống khi click chuột */
 }

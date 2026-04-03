@@ -1,14 +1,11 @@
 package com.example.documentmanagementbackend.controller;
 
-
 import com.example.documentmanagementbackend.dto.request.CreateUserRequest;
-import com.example.documentmanagementbackend.dto.request.LoginRequest;
-import com.example.documentmanagementbackend.service.AuthService;
 import com.example.documentmanagementbackend.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,37 +17,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
-public class AuthController {
-    private final AuthService authService;
+@PreAuthorize("hasRole('ADMIN')")
+public class AdminController {
+
     private final UserService userService;
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @Valid @RequestBody LoginRequest request,
-            BindingResult bindingResult
-    ) {
-        // 1. Bắt lỗi Validation ngay lập tức nếu có
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            // Lặp qua các trường bị lỗi và lấy ra thông báo lỗi đã định nghĩa trong DTO
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-
-            // Trả về HTTP 400 Bad Request kèm danh sách lỗi
-            return ResponseEntity.badRequest().body(errors);
-        }
-        System.out.println(request.getEmail());
-        return authService.login(request);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(
+    /**
+     * API tạo người dùng mới (chỉ dành cho Admin)
+     * @param request Thông tin người dùng cần tạo
+     * @param bindingResult Kết quả validation
+     * @return ResponseEntity chứa thông tin người dùng đã tạo hoặc thông báo lỗi
+     */
+    @PostMapping("/users")
+    public ResponseEntity<?> createUser(
             @Valid @RequestBody CreateUserRequest request,
             BindingResult bindingResult
     ) {
+        // Bắt lỗi Validation ngay lập tức nếu có
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
@@ -58,6 +42,7 @@ public class AuthController {
             }
             return ResponseEntity.badRequest().body(errors);
         }
+
         return userService.createUser(request);
     }
 }

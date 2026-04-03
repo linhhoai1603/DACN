@@ -1,21 +1,68 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Shield, CloudSync, Lock, User, Phone, Eye } from 'lucide-react';
 import './Loginpage.css';
 
-const LoginPage = ({ onSignIn }) => {
+const API_BASE = 'http://localhost:8080';
+
+const LoginPage = ({ onSignIn, onNavigateSignUp }) => {
+    const [form, setForm] = useState({ email: '', phoneNumber: '', password: '' });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleChange = (e) => {
+        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        setError('');
+    };
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const res = await fetch(`${API_BASE}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(form),
+            });
+
+            const data = await res.text();
+
+            if (!res.ok) {
+                // data có thể là plain string lỗi hoặc JSON validation errors
+                try {
+                    const parsed = JSON.parse(data);
+                    const messages = Object.values(parsed).join(', ');
+                    setError(messages);
+                } catch {
+                    setError(data || 'Login failed');
+                }
+                return;
+            }
+
+            // data là JWT token
+            localStorage.setItem('token', data);
+            onSignIn();
+        } catch {
+            setError('Cannot connect to server. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="outer-container">
             <header className="main-header">
                 <div className="logo">DocuManage</div>
                 <div className="header-right">
-                    <a href="#" className="help-link">Help</a>
-                    <button className="btn-signup-header">Sign Up</button>
+                    <a href="" className="help-link">Help</a>
+                    <button className="btn-signup-header" onClick={onNavigateSignUp}>
+                        Sign Up
+                    </button>
                 </div>
             </header>
 
-            {/* Khối Login chính chia làm 2 cột */}
             <div className="login-page-wrapper">
-                {/* Cột trái - Branding */}
+            {/* Cột trái - Branding */}
                 <div className="branding-section">
                     <div className="badge-security">
                         <Shield size={16} /> Enterprise Grade Security
@@ -47,12 +94,21 @@ const LoginPage = ({ onSignIn }) => {
                         <h2 className="form-heading">Welcome Back</h2>
                         <p className="form-desc">Enter your credentials to access your workspace.</p>
 
-                        <form className="login-form">
+                        {error && <div className="error-banner">{error}</div>}
+
+                        <form className="login-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                             <div className="input-group">
-                                <label>Username</label>
+                                <label>Username (Email)</label>
                                 <div className="input-wrapper">
                                     <User className="icon-left" size={18} />
-                                    <input type="text" className="input-field" placeholder="j.doe@company.com" />
+                                    <input
+                                        type="text"
+                                        name="email"
+                                        className="input-field"
+                                        placeholder="j.doe@company.com"
+                                        value={form.email}
+                                        onChange={handleChange}
+                                    />
                                 </div>
                             </div>
 
@@ -60,7 +116,15 @@ const LoginPage = ({ onSignIn }) => {
                                 <label>Phone Number</label>
                                 <div className="input-wrapper">
                                     <Phone className="icon-left" size={18} />
-                                    <input type="text" className="input-field" placeholder="+1 (555) 000-0000" />
+
+                                    <input
+                                        type="text"
+                                        name="phoneNumber"
+                                        className="input-field"
+                                        placeholder="0912345678"
+                                        value={form.phoneNumber}
+                                        onChange={handleChange}
+                                    />
                                 </div>
                             </div>
 
@@ -68,12 +132,26 @@ const LoginPage = ({ onSignIn }) => {
                                 <label>Password</label>
                                 <div className="input-wrapper">
                                     <Lock className="icon-left" size={18} />
-                                    <input type="password" className="input-field" placeholder="••••••••" />
-                                    <Eye className="icon-right" size={18} />
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        name="password"
+                                        className="input-field"
+                                        placeholder="••••••••"
+                                        value={form.password}
+                                        onChange={handleChange}
+                                    />
+                                    <Eye
+                                        className="icon-right"
+                                        size={18}
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => setShowPassword((v) => !v)}
+                                    />
                                 </div>
                             </div>
 
-                            <button type="button" className="btn-submit" onClick={onSignIn}>Sign In</button>
+                            <button type="submit" className="btn-submit" disabled={loading}>
+                                {loading ? 'Signing in...' : 'Sign In'}
+                            </button>
                         </form>
                     </div>
                 </div>

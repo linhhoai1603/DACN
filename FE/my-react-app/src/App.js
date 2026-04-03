@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import LoginPage from './page/LoginPage';
+import SignUpPage from './page/SignUpPage';
 import UploadDashboard from './page/UploadDashboard';
 import VersionControl from './page/VersionControl';
 import VersionDetail from './page/Version-Detail';
 
 const LOGIN_ROUTE = '/login';
+const SIGNUP_ROUTE = '/signup';
 const DASHBOARD_ROUTE = '/dashboard';
 const VERSION_CONTROL_ROUTE = '/version-control';
 const VERSION_DETAIL_ROUTE = '/version-detail';
@@ -17,6 +19,7 @@ const resolveRoute = (pathname) => {
   ) {
     return pathname;
   }
+  if (pathname === SIGNUP_ROUTE) return SIGNUP_ROUTE;
 
   return LOGIN_ROUTE;
 };
@@ -60,7 +63,7 @@ function App() {
   }
 
   return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
-
+  // return <UploadDashboard/>;
 }
 
 export default App;

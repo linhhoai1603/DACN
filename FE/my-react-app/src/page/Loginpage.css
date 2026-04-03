@@ -152,6 +152,7 @@
 .btn-submit:active {
     transform: translateY(0); /* Nhấn xuống khi click chuột */
 }
+
 /* Tùy chỉnh riêng cho ô Select */
 .select-field {
     appearance: none; /* Xóa mũi tên mặc định của trình duyệt */
@@ -181,4 +182,14 @@
     color: #4A5D7E;
     margin-bottom: 4px;
     display: block;
+}
+
+.error-banner {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { Shield, CloudSync, Lock, User, Phone, Eye } from 'lucide-react';
 import './Loginpage.css';
 
-const LoginPage = () => {
+const LoginPage = ({ onSignIn }) => {
     return (
         <div className="outer-container">
             <header className="main-header">
@@ -73,7 +73,7 @@ const LoginPage = () => {
                                 </div>
                             </div>
 
-                            <button type="button" className="btn-submit">Sign In</button>
+                            <button type="button" className="btn-submit" onClick={onSignIn}>Sign In</button>
                         </form>
                     </div>
                 </div>

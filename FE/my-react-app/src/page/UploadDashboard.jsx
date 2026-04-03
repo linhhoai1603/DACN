@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import './UploadDashboard.css';
 
-function UploadDashboard() {
+function UploadDashboard({ onLogout }) {
   const fileInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [queueItems, setQueueItems] = useState([
@@ -148,7 +148,7 @@ function UploadDashboard() {
 
         <div className="sidebar-footer">
           <button type="button" className="menu-item">Security</button>
-          <button type="button" className="menu-item">Log Out</button>
+          <button type="button" className="menu-item" onClick={onLogout}>Log Out</button>
         </div>
       </aside>
 

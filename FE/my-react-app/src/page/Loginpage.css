@@ -1,0 +1,112 @@
+/* Container bao phủ toàn màn hình */
+.outer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f8fafc;
+    padding: 20px;
+}
+
+/* Header nằm trên khối login */
+.main-header {
+    width: 100%;
+    max-width: 1100px; /* Bằng chiều rộng khối Login */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+    color: #2C3E5D;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.btn-signup-header {
+    background-color: #4A5D7E;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Khối Login chính */
+.login-page-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    background: #ffffff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+}
+
+/* Chia đôi 2 cột */
+.branding-section, .form-section {
+    width: 50%;
+}
+
+.branding-section {
+    background: linear-gradient(135deg, #4A5D7E 0%, #2C3E5D 100%);
+    color: white;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.form-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+}
+
+/* CSS cho Icon (Quan trọng để hiện icon) */
+.input-wrapper {
+    position: relative;
+    margin-top: 8px;
+}
+
+.icon-left {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+.icon-right {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.input-field {
+    width: 100%;
+    padding: 14px 15px 14px 45px !important;
+    background: #F4F7FA;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-field:focus {
+    border-color: #4A5D7E;
+    background: #fff;
+}

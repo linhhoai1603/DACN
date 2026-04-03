@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import LoginPage from './page/LoginPage';
+import SignUpPage from './page/SignUpPage';
 import UploadDashboard from './page/UploadDashboard';
 
 const LOGIN_ROUTE = '/login';
+const SIGNUP_ROUTE = '/signup';
 const DASHBOARD_ROUTE = '/dashboard';
 
 const resolveRoute = (pathname) => {
   if (pathname === DASHBOARD_ROUTE) {
     return DASHBOARD_ROUTE;
   }
+  if (pathname === SIGNUP_ROUTE) return SIGNUP_ROUTE;
 
   return LOGIN_ROUTE;
 };
@@ -41,7 +44,13 @@ function App() {
     return <UploadDashboard onLogout={() => navigateTo(LOGIN_ROUTE)} />;
   }
 
-  return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
+  if (currentRoute === SIGNUP_ROUTE) {
+    return <SignUpPage onNavigate={() => navigateTo(LOGIN_ROUTE)} />;
+  }
+
+  return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)}
+                    onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)}
+  />;
   // return <UploadDashboard/>;
 }
 

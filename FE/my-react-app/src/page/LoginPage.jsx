@@ -4,7 +4,7 @@ import './Loginpage.css';
 
 const API_BASE = 'http://localhost:8080';
 
-const LoginPage = ({ onSignIn }) => {
+const LoginPage = ({ onSignIn, onNavigateSignUp }) => {
     const [form, setForm] = useState({ email: '', phoneNumber: '', password: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -54,13 +54,15 @@ const LoginPage = ({ onSignIn }) => {
             <header className="main-header">
                 <div className="logo">DocuManage</div>
                 <div className="header-right">
-                    <a href="#" className="help-link">Help</a>
-                    <button className="btn-signup-header">Sign Up</button>
+                    <a href="" className="help-link">Help</a>
+                    <button className="btn-signup-header" onClick={onNavigateSignUp}>
+                        Sign Up
+                    </button>
                 </div>
             </header>
 
             <div className="login-page-wrapper">
-                {/* Cột trái - Branding */}
+            {/* Cột trái - Branding */}
                 <div className="branding-section">
                     <div className="badge-security">
                         <Shield size={16} /> Enterprise Grade Security
@@ -114,6 +116,7 @@ const LoginPage = ({ onSignIn }) => {
                                 <label>Phone Number</label>
                                 <div className="input-wrapper">
                                     <Phone className="icon-left" size={18} />
+
                                     <input
                                         type="text"
                                         name="phoneNumber"

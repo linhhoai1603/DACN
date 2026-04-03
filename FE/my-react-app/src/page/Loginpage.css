@@ -4,9 +4,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /*min-height: 100vh;*/
     background-color: #f8fafc;
-    padding: 20px;
+    /*padding: 20px;*/
 }
 
 /* Header nằm trên khối login */
@@ -152,6 +151,37 @@
 
 .btn-submit:active {
     transform: translateY(0); /* Nhấn xuống khi click chuột */
+}
+
+/* Tùy chỉnh riêng cho ô Select */
+.select-field {
+    appearance: none; /* Xóa mũi tên mặc định của trình duyệt */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    color: #475569;
+}
+
+/* Icon mũi tên xuống cho Select */
+.icon-right-select {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none; /* Để click xuyên qua icon vào select được */
+}
+
+.login-form {
+    gap: 10px !important;
+}
+
+.input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4A5D7E;
+    margin-bottom: 4px;
+    display: block;
 }
 
 .error-banner {

@@ -2,20 +2,22 @@ import React from 'react';
 import { Shield, CloudSync, Lock, User, Phone, Eye } from 'lucide-react';
 import './Loginpage.css';
 
-const LoginPage = ({ onSignIn }) => {
+const LoginPage = ({ onSignIn, onNavigateSignUp }) => {
     return (
         <div className="outer-container">
             <header className="main-header">
                 <div className="logo">DocuManage</div>
                 <div className="header-right">
-                    <a href="#" className="help-link">Help</a>
-                    <button className="btn-signup-header">Sign Up</button>
+                    <a href="" className="help-link">Help</a>
+                    <button className="btn-signup-header" onClick={onNavigateSignUp}>
+                        Sign Up
+                    </button>
                 </div>
             </header>
 
             {/* Khối Login chính chia làm 2 cột */}
             <div className="login-page-wrapper">
-                {/* Cột trái - Branding */}
+            {/* Cột trái - Branding */}
                 <div className="branding-section">
                     <div className="badge-security">
                         <Shield size={16} /> Enterprise Grade Security
@@ -60,7 +62,7 @@ const LoginPage = ({ onSignIn }) => {
                                 <label>Phone Number</label>
                                 <div className="input-wrapper">
                                     <Phone className="icon-left" size={18} />
-                                    <input type="text" className="input-field" placeholder="+1 (555) 000-0000" />
+                                    <input type="text" className="input-field" placeholder="+84 555 000 000" />
                                 </div>
                             </div>
 

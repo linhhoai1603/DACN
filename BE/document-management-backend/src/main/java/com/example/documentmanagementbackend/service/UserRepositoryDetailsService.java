@@ -18,7 +18,7 @@ public class UserRepositoryDetailsService implements UserDetailsService {
 	@Transactional
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		// TODO Auto-generated method stub
-		return repository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with username: '" + email + "' not found"));
+		return repository.findUserByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with username: '" + email + "' not found"));
 	}
 
 }

@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/files/upload").permitAll()
                         .anyRequest().authenticated()
                 ).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
@@ -76,5 +77,3 @@ public class SecurityConfig {
         return new DefaultHttpFirewall();
     }
 }
-
-

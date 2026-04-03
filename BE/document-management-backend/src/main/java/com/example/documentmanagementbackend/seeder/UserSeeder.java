@@ -26,19 +26,7 @@ public class UserSeeder implements CommandLineRunner {
 				buildUser("Pham Thi D", "Can Tho", "thid@example.com", "0351234567", "Dsecure@012", Role.ADMIN),
 				buildUser("Hoang Van E", "Hai Phong", "vane@example.com", "0387654321", "Elogin@345", Role.USER)
 		);
-
-		List<User> usersToSave = new ArrayList<>();
-		for (User user : seedUsers) {
-			boolean emailExists = userRepository.findByEmail(user.getEmail()).isPresent();
-			boolean phoneExists = userRepository.findByPhone(user.getPhone()).isPresent();
-			if (!emailExists && !phoneExists) {
-				usersToSave.add(user);
-			}
-		}
-
-		if (!usersToSave.isEmpty()) {
-			userRepository.saveAll(usersToSave);
-		}
+			userRepository.saveAll(seedUsers);
 	}
 
 	private User buildUser(String fullName, String address, String email, String phone, String rawPassword, Role role) {

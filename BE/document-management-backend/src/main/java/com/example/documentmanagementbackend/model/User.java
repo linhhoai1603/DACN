@@ -14,12 +14,11 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "users")
-// Đổi tên bảng thành "users" vì "user" thường là từ khóa từ khóa hệ thống trong nhiều database (như PostgreSQL)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users") // BẮT BUỘC phải có dòng này khi dùng PostgreSQL
 public class User implements UserDetails {
 
     @Id
@@ -46,8 +45,6 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    // --- CÁC METHOD CỦA INTERFACE USERDETAILS ---
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Trả về danh sách quyền của user. Spring Security mặc định hiểu prefix "ROLE_"
@@ -61,10 +58,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        // Trả về trường được dùng làm định danh đăng nhập chính.
-        // Ở đây giả sử dùng số điện thoại làm định danh. Nếu hệ thống dùng cả username,
-        // bạn có thể thêm trường username vào Entity và return nó ở đây.
-        return phone;
+        return email;
     }
 
     @Override

@@ -31,7 +31,6 @@ public class AuthController {
         // 1. Bắt lỗi Validation ngay lập tức nếu có
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
-
             // Lặp qua các trường bị lỗi và lấy ra thông báo lỗi đã định nghĩa trong DTO
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errors.put(error.getField(), error.getDefaultMessage());
@@ -40,7 +39,7 @@ public class AuthController {
             // Trả về HTTP 400 Bad Request kèm danh sách lỗi
             return ResponseEntity.badRequest().body(errors);
         }
-
+        System.out.println(request.getEmail());
         return authService.login(request);
     }
 }

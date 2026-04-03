@@ -47,7 +47,7 @@ class UserServiceTest {
         validRequest.setPhone("0901234567");
         validRequest.setPassword("password123");
         validRequest.setAddress("Hà Nội");
-        validRequest.setRole(Role.USER);
+        validRequest.setRole(Role.USERS);
     }
 
     @Test

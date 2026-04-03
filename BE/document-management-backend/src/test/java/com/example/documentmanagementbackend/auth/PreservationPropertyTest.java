@@ -52,7 +52,7 @@ class PreservationPropertyTest {
         existingUser.setPhone(PHONE);
         existingUser.setPassword(passwordEncoder.encode(RAW_PASSWORD));
         existingUser.setFullName("Test User");
-        existingUser.setRole(Role.USER);
+        existingUser.setRole(Role.USERS);
 
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(existingUser));
         when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());

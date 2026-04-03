@@ -28,9 +28,9 @@
   - Verify tests PASS on UNFIXED code
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [-] 3. Fix getUsername() mismatch bug
+- [x] 3. Fix getUsername() mismatch bug
 
-  - [-] 3.1 Implement the fix in User.java
+  - [x] 3.1 Implement the fix in User.java
     - Sửa `User.getUsername()` để trả về `email` thay vì `phone`
     - Đảm bảo nhất quán với `loadUserByUsername()` đang dùng `findByEmail()`
     - Đảm bảo JWT subject được set bằng email (vì `generateToken` dùng `userDetails.getUsername()`)
@@ -39,7 +39,7 @@
     - _Preservation: email không tồn tại → lỗi phù hợp; password sai → HTTP 401; phone không khớp → lỗi phù hợp; validation lỗi → HTTP 400_
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [ ] 3.2 Verify bug condition exploration test now passes
+  - [x] 3.2 Verify bug condition exploration test now passes
     - **Property 1: Expected Behavior** - Valid Login Returns HTTP 200 + JWT
     - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
     - The test from task 1 encodes the expected behavior
@@ -47,12 +47,12 @@
     - **EXPECTED OUTCOME**: Test PASSES (confirms `getUsername()` returns email and login returns HTTP 200 + JWT)
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [ ] 3.3 Verify preservation tests still pass
+  - [x] 3.3 Verify preservation tests still pass
     - **Property 2: Preservation** - Error Handling Behaviors Unchanged
     - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
     - Run preservation property tests from step 2
     - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions in error handling)
     - Confirm all error scenarios still behave identically after fix
 
-- [ ] 4. Checkpoint - Ensure all tests pass
+- [x] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.

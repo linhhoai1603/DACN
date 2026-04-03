@@ -6,7 +6,7 @@ import com.example.documentmanagementbackend.model.User;
 import com.example.documentmanagementbackend.repository.UserRepository;
 import com.example.documentmanagementbackend.service.UserRepositoryDetailsService;
 import com.example.documentmanagementbackend.service.impl.AuthServiceImpl;
-import com.example.documentmanagementbackend.service.impl.JwtServiceImpl;
+import com.example.documentmanagementbackend.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -69,7 +69,7 @@ class BugConditionExplorationTest {
             throw new RuntimeException(e);
         }
 
-        JwtServiceImpl jwtService = mock(JwtServiceImpl.class);
+        JwtService jwtService = mock(JwtService.class);
         when(jwtService.generateToken(user)).thenReturn("mock-jwt-token");
 
         authService = new AuthServiceImpl(userRepository, jwtService, passwordEncoder);

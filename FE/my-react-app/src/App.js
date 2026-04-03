@@ -1,25 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
+import LoginPage from './page/LoginPage';
+import UploadDashboard from './page/UploadDashboard';
+
+const LOGIN_ROUTE = '/login';
+const DASHBOARD_ROUTE = '/dashboard';
+
+const resolveRoute = (pathname) => {
+  if (pathname === DASHBOARD_ROUTE) {
+    return DASHBOARD_ROUTE;
+  }
+
+  return LOGIN_ROUTE;
+};
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [currentRoute, setCurrentRoute] = useState(() => resolveRoute(window.location.pathname));
+
+  useEffect(() => {
+    const normalized = resolveRoute(window.location.pathname);
+    if (window.location.pathname !== normalized) {
+      window.history.replaceState({}, '', normalized);
+    }
+
+    const handlePopState = () => {
+      setCurrentRoute(resolveRoute(window.location.pathname));
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateTo = (route) => {
+    if (window.location.pathname !== route) {
+      window.history.pushState({}, '', route);
+    }
+    setCurrentRoute(route);
+  };
+
+  if (currentRoute === DASHBOARD_ROUTE) {
+    return <UploadDashboard onLogout={() => navigateTo(LOGIN_ROUTE)} />;
+  }
+
+  return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
+  // return <UploadDashboard/>;
 }
 
 export default App;

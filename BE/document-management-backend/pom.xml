@@ -78,7 +78,6 @@
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
-<<<<<<< HEAD
 
         <!-- Source: https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http44 -->
         <dependency>
@@ -94,7 +93,8 @@
             <artifactId>java-dotenv</artifactId>
             <version>5.2.2</version>
             <scope>compile</scope>
-=======
+        </dependency>
+
         <!--Jwt library-->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -112,7 +112,6 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.12.6</version>
             <scope>runtime</scope>
->>>>>>> 8990851c3afc5a212bf3e4c9e0a6bd62aac7b25e
         </dependency>
     </dependencies>
 

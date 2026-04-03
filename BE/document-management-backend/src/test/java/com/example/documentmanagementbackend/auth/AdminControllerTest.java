@@ -47,7 +47,7 @@ class AdminControllerTest {
         validRequest.setPhone("0901234567");
         validRequest.setPassword("password123");
         validRequest.setAddress("Hà Nội");
-        validRequest.setRole(Role.USER);
+        validRequest.setRole(Role.USERS);
     }
 
     @Test
@@ -63,7 +63,7 @@ class AdminControllerTest {
         savedUser.setEmail("test@example.com");
         savedUser.setPhone("0901234567");
         savedUser.setAddress("Hà Nội");
-        savedUser.setRole(Role.USER);
+        savedUser.setRole(Role.USERS);
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         ResponseEntity<?> response = userService.createUser(validRequest);

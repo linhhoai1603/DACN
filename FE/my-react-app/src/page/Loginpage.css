@@ -193,3 +193,20 @@
     font-size: 0.875rem;
     margin-bottom: 16px;
 }
+
+.success-banner {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #86efac;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+}
+
+.field-error {
+    color: #b91c1c;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: block;
+}

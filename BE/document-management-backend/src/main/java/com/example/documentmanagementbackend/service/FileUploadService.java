@@ -3,11 +3,13 @@ package com.example.documentmanagementbackend.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.documentmanagementbackend.dto.response.FileUploadResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
+@Slf4j
 @Service
 public class FileUploadService {
 
@@ -17,7 +19,12 @@ public class FileUploadService {
         this.cloudinary = cloudinary;
     }
 
-    public FileUploadResponse upload(MultipartFile file) {
+    public FileUploadResponse upload(MultipartFile file, Long userId, String email, String fullName, String role) {
+
+        System.out.println("userId: " + userId);
+        System.out.println("email: " + email);
+        System.out.println("fullName: " + fullName);
+        System.out.println("role: " + role);
 
         try {
             if (file.isEmpty()) {
@@ -26,6 +33,8 @@ public class FileUploadService {
 
             // Lấy tên file gốc (giữ extension)
             String originalFilename = file.getOriginalFilename();
+
+            log.info("Upload initiated by userId={}, email={}", userId, email);
 
             // Upload file
             Map uploadResult = cloudinary.uploader().upload(
@@ -37,9 +46,13 @@ public class FileUploadService {
                     )
             );
 
+            String publicId = uploadResult.get("public_id").toString();
+
+            log.info("Upload completed: publicId={}, userId={}, email={}", publicId, userId, email);
+
             return new FileUploadResponse(
                     uploadResult.get("secure_url").toString(),
-                    uploadResult.get("public_id").toString(),
+                    publicId,
                     originalFilename,
                     file.getSize()
             );

@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -24,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<String> login(LoginRequest request) {
         System.out.println(request.getEmail());
-        Optional<User> user = userRepository.findUserByEmail(request.getEmail());
+        Optional<User> user = userRepository.findByEmail(request.getEmail());
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Email not found");

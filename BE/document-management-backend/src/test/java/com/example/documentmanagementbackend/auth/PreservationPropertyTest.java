@@ -5,7 +5,7 @@ import com.example.documentmanagementbackend.model.Role;
 import com.example.documentmanagementbackend.model.User;
 import com.example.documentmanagementbackend.repository.UserRepository;
 import com.example.documentmanagementbackend.service.impl.AuthServiceImpl;
-import com.example.documentmanagementbackend.service.impl.JwtServiceImpl;
+import com.example.documentmanagementbackend.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -54,10 +54,10 @@ class PreservationPropertyTest {
         existingUser.setFullName("Test User");
         existingUser.setRole(Role.USER);
 
-        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(existingUser));
-        when(userRepository.findUserByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
-        JwtServiceImpl jwtService = mock(JwtServiceImpl.class);
+        JwtService jwtService = mock(JwtService.class);
         when(jwtService.generateToken(existingUser)).thenReturn("mock-jwt-token");
 
         authService = new AuthServiceImpl(userRepository, jwtService, passwordEncoder);

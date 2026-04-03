@@ -1,8 +1,10 @@
 package com.example.documentmanagementbackend.controller;
 
 
+import com.example.documentmanagementbackend.dto.request.CreateUserRequest;
 import com.example.documentmanagementbackend.dto.request.LoginRequest;
 import com.example.documentmanagementbackend.service.AuthService;
+import com.example.documentmanagementbackend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
@@ -41,5 +44,20 @@ public class AuthController {
         }
         System.out.println(request.getEmail());
         return authService.login(request);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(
+            @Valid @RequestBody CreateUserRequest request,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
+        }
+        return userService.createUser(request);
     }
 }

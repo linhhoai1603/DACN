@@ -42,6 +42,7 @@ function App() {
   }
 
   return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
+  // return <UploadDashboard/>;
 }
 
 export default App;

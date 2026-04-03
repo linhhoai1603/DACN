@@ -3,7 +3,7 @@ import './UploadDashboard.css';
 
 const API_BASE = 'http://localhost:8080';
 
-function UploadDashboard({ onLogout }) {
+function UploadDashboard({ onLogout, onNavigate }) {
   const fileInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [queueItems, setQueueItems] = useState([]);
@@ -155,6 +155,7 @@ function UploadDashboard({ onLogout }) {
               <button type="button" className="menu-item">Shared</button>
               <button type="button" className="menu-item">Starred</button>
               <button type="button" className="menu-item">Trash</button>
+              <button type="button" className="menu-item" onClick={() => onNavigate('/version-control')}>Version Control List</button>
             </nav>
           </div>
 

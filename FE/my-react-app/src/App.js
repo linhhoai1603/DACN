@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react';
 import LoginPage from './page/LoginPage';
 import UploadDashboard from './page/UploadDashboard';
+import VersionControl from './page/VersionControl';
+import VersionDetail from './page/Version-Detail';
 
 const LOGIN_ROUTE = '/login';
 const DASHBOARD_ROUTE = '/dashboard';
+const VERSION_CONTROL_ROUTE = '/version-control';
+const VERSION_DETAIL_ROUTE = '/version-detail';
 
 const resolveRoute = (pathname) => {
-  if (pathname === DASHBOARD_ROUTE) {
-    return DASHBOARD_ROUTE;
+  if (
+    pathname === DASHBOARD_ROUTE ||
+    pathname === VERSION_CONTROL_ROUTE ||
+    pathname === VERSION_DETAIL_ROUTE
+  ) {
+    return pathname;
   }
 
   return LOGIN_ROUTE;
@@ -34,15 +42,25 @@ function App() {
     if (window.location.pathname !== route) {
       window.history.pushState({}, '', route);
     }
-    setCurrentRoute(route);
+    // Extract pathname without query string
+    const pathname = route.split('?')[0];
+    setCurrentRoute(pathname);
   };
 
   if (currentRoute === DASHBOARD_ROUTE) {
-    return <UploadDashboard onLogout={() => navigateTo(LOGIN_ROUTE)} />;
+    return <UploadDashboard onLogout={() => navigateTo(LOGIN_ROUTE)} onNavigate={navigateTo} />;
+  }
+
+  if (currentRoute === VERSION_CONTROL_ROUTE) {
+    return <VersionControl onNavigate={navigateTo} />;
+  }
+
+  if (currentRoute === VERSION_DETAIL_ROUTE) {
+    return <VersionDetail onNavigate={navigateTo} />;
   }
 
   return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
-  // return <UploadDashboard/>;
+
 }
 
 export default App;

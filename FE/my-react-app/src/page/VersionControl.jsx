@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import './VersionControl.css';
 
-const VersionControl = () => {
+const VersionControl = ({ onNavigate }) => {
     const documents = [
         { name: 'Q3_Financial_Review.pdf', size: '2.4 MB', type: 'PDF Document', status: 'COMPLETED', user: 'Alex Riviera', date: 'Oct 24, 2023' },
         { name: 'Contract_Draft_V4.docx', size: '840 KB', type: 'Word Document', status: 'PENDING', user: 'Sarah Jenkins', date: 'Oct 23, 2023' },
@@ -45,6 +45,9 @@ const VersionControl = () => {
             <main className="main-area">
                 {/* Top Header */}
                 <header className="top-nav">
+                    <button className="btn-back" onClick={() => onNavigate('/dashboard')}>
+                        <ChevronLeft size={20} /> Back to Dashboard
+                    </button>
                     <div className="search-bar">
                         <Search size={18} />
                         <input type="text" placeholder="Search Document..." />
@@ -86,21 +89,25 @@ const VersionControl = () => {
                         </thead>
                         <tbody>
                         {documents.map((doc, index) => (
-                            <tr key={index}>
-                                <td>
-                                    <div className="file-info">
-                                        <div className="file-icon"><FileText size={18}/></div>
-                                        <div>
-                                            <strong>{doc.name}</strong>
-                                            <p>{doc.size} • {doc.type}</p>
-                                        </div>
+                            <tr
+                            key={index}
+                            className="clickable-row"
+                            onClick={() => onNavigate(`/version-detail?file=${encodeURIComponent(doc.name)}`)}
+                        >
+                            <td>
+                                <div className="file-info">
+                                    <div className="file-icon"><FileText size={18}/></div>
+                                    <div>
+                                        <strong>{doc.name}</strong>
+                                        <p>{doc.size} • {doc.type}</p>
                                     </div>
-                                </td>
-                                <td><span className={`status-badge ${doc.status.toLowerCase()}`}>{doc.status}</span></td>
-                                <td>{doc.user}</td>
-                                <td>{doc.date}</td>
-                                <td><Eye size={18} className="icon-view"/></td>
-                            </tr>
+                                </div>
+                            </td>
+                            <td><span className={`status-badge ${doc.status.toLowerCase()}`}>{doc.status}</span></td>
+                            <td>{doc.user}</td>
+                            <td>{doc.date}</td>
+                            <td><Eye size={18} className="icon-view"/></td>
+                        </tr>
                         ))}
                         </tbody>
                     </table>

@@ -36,35 +36,44 @@ jobs:
 
       - name: Deploy on EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_FILE_CONTENT: ${{ secrets.ENV_FILE_CONTENT }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME || 'ec2-user' }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script_stop: true
+          envs: ENV_FILE_CONTENT
           script: |
             set -e
             mkdir -p /home/ec2-user/app
             cd /home/ec2-user/app
 
-            # Create .env from GitHub Secret content
-            cat > .env << 'EOF'
-            ${{ secrets.ENV_FILE_CONTENT }}
-            EOF
+            # 1. Tạo file .env
+            printf "%s\n" "$ENV_FILE_CONTENT" > .env
+            chmod 600 .env
 
-            # Stop process currently listening on port 8080 (if any)
-            PID=""
-            if command -v lsof >/dev/null 2>&1; then
-              PID=$(lsof -ti:8080 || true)
-            else
-              PID=$(ss -ltnp '( sport = :8080 )' 2>/dev/null | awk -F'pid=' 'NR>1 {print $2}' | awk -F',' '{print $1}' | head -n1)
-            fi
+            # 2. Kill process cũ trên port 8080
+            # Dùng sudo lsof để đảm bảo tìm thấy process của các user khác nếu có
+            PID=$(sudo lsof -ti:8080 || true)
             if [ -n "$PID" ]; then
-              kill -9 $PID
+              sudo kill -9 $PID
               echo "Killed process on port 8080: $PID"
-            else
-              echo "No process is listening on port 8080"
             fi
 
-            # Start application in background
-            nohup java -jar *.jar > app.log 2>&1 &
-            echo "Application started. Check logs with: tail -f /home/ec2-user/app/app.log"
+            # 3. Tìm file JAR mới nhất
+            JAR_FILE=$(ls -t *.jar 2>/dev/null | head -n1)
+            if [ -z "$JAR_FILE" ]; then
+              echo "Error: No .jar file found!"
+              exit 1
+            fi
+
+            # 4. Chạy ứng dụng với biến môi trường
+            # Nạp biến từ .env và chạy nohup
+            set -a
+            [ -f .env ] && . .env
+            set +a
+            
+            nohup java -jar "$JAR_FILE" > app.log 2>&1 &
+            
+            echo "Deployment successful. App is running: $JAR_FILE"

@@ -62,8 +62,8 @@ function App() {
     return <VersionDetail onNavigate={navigateTo} />;
   }
 
-  return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
-  // return <UploadDashboard/>;
+  // return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
+  return <UploadDashboard/>;
 }
 
 export default App;

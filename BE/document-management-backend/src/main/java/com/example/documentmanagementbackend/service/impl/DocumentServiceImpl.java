@@ -1,6 +1,7 @@
 package com.example.documentmanagementbackend.service.impl;
 
 import com.example.documentmanagementbackend.dto.request.CreateDocumentRequest;
+import com.example.documentmanagementbackend.dto.response.DocumentSummaryResponse;
 import com.example.documentmanagementbackend.dto.response.DocumentVersionResponse;
 import com.example.documentmanagementbackend.dto.response.ImageKitUploadResponse;
 import com.example.documentmanagementbackend.entity.Document;
@@ -16,9 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -66,6 +67,58 @@ public class DocumentServiceImpl implements DocumentService {
 
         return persistVersion(document, nextVersion, commitMessage, file, username);
     }
+
+        @Override
+        @Transactional(readOnly = true)
+        public List<DocumentSummaryResponse> getMyDocuments(String username) {
+        return documentRepository.findByCreatedByAndIsDeletedFalseOrderByCreatedAtDesc(username)
+            .stream()
+            .map(document -> {
+                Integer latestVersion = documentVersionRepository.findTopByDocumentOrderByVersionNumberDesc(document)
+                    .map(DocumentVersion::getVersionNumber)
+                    .orElse(0);
+                return new DocumentSummaryResponse(
+                    document.getId(),
+                    document.getTitle(),
+                    document.getDescription(),
+                    document.getStatus(),
+                    latestVersion,
+                    document.getCreatedAt(),
+                    document.getCreatedBy()
+                );
+            })
+            .toList();
+        }
+
+        @Override
+        @Transactional(readOnly = true)
+        public List<DocumentVersionResponse> getDocumentVersions(UUID documentId, String username, boolean isAdmin) {
+        Document document;
+        if (isAdmin) {
+            document = documentRepository.findByIdAndIsDeletedFalse(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found: " + documentId));
+        } else {
+            document = documentRepository.findByIdAndCreatedByAndIsDeletedFalse(documentId, username)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found: " + documentId));
+        }
+
+        return documentVersionRepository.findByDocumentIdOrderByVersionNumberDesc(document.getId())
+            .stream()
+            .map(version -> new DocumentVersionResponse(
+                version.getId(),
+                document.getId(),
+                version.getVersionNumber(),
+                version.getFileUrl(),
+                version.getFileId(),
+                version.getFileName(),
+                version.getFileSize(),
+                version.getFileHash(),
+                version.getCommitMessage(),
+                version.getCreatedBy(),
+                version.getCreatedAt()
+            ))
+            .toList();
+        }
 
     private DocumentVersionResponse persistVersion(Document document, int version, String commitMessage, MultipartFile file, String username) {
         ImageKitUploadResponse uploaded = imageKitService.uploadFile(file, "/documents/" + document.getId());

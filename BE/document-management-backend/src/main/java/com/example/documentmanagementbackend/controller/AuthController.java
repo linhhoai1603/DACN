@@ -1,6 +1,7 @@
 package com.example.documentmanagementbackend.controller;
 
 import com.example.documentmanagementbackend.dto.ApiResponse;
+import com.example.documentmanagementbackend.dto.request.AdminCreateUserRequest;
 import com.example.documentmanagementbackend.dto.request.LoginRequest;
 import com.example.documentmanagementbackend.dto.request.RegisterRequest;
 import com.example.documentmanagementbackend.dto.response.LoginResponse;
@@ -9,6 +10,7 @@ import com.example.documentmanagementbackend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +38,21 @@ public class AuthController {
                 request.getFullName()
         );
         return ResponseEntity.ok(ApiResponse.success("Register successful", response));
+    }
+
+    @PostMapping("/admin/create-user")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('USER_MANAGEMENT')")
+    public ResponseEntity<ApiResponse<RegisterResponse>> createUserByAdmin(
+            @Valid @RequestBody AdminCreateUserRequest request
+    ) {
+        RegisterResponse response = authService.createUserByAdmin(
+                request.getUsername(),
+                request.getPassword(),
+                request.getEmail(),
+                request.getFullName(),
+                request.getRoleName(),
+                request.getIsActive()
+        );
+        return ResponseEntity.ok(ApiResponse.success("User created by admin successfully", response));
     }
 }

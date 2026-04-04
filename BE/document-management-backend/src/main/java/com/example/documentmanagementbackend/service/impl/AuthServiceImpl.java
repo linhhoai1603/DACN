@@ -79,4 +79,42 @@ public class AuthServiceImpl implements AuthService {
                 savedUser.getIsActive()
         );
     }
+
+    @Override
+    public RegisterResponse createUserByAdmin(
+            String username,
+            String rawPassword,
+            String email,
+            String fullName,
+            String roleName,
+            Boolean isActive
+    ) {
+        if (userRepository.existsByUsername(username)) {
+            throw new BadRequestException("Username already exists");
+        }
+        if (userRepository.existsByEmail(email)) {
+            throw new BadRequestException("Email already exists");
+        }
+
+        String targetRole = (roleName == null || roleName.isBlank()) ? "ROLE_MODERATOR" : roleName;
+        Role role = roleRepository.findByName(targetRole)
+                .orElseThrow(() -> new BadRequestException("Role not found: " + targetRole));
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(rawPassword));
+        user.setEmail(email);
+        user.setFullName(fullName);
+        user.setIsActive(isActive == null ? Boolean.TRUE : isActive);
+        user.setRoles(Set.of(role));
+
+        User savedUser = userRepository.save(user);
+        return new RegisterResponse(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getEmail(),
+                savedUser.getFullName(),
+                savedUser.getIsActive()
+        );
+    }
 }

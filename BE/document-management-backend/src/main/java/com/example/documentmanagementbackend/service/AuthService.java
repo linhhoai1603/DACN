@@ -7,4 +7,13 @@ public interface AuthService {
     LoginResponse login(String username, String password);
 
     RegisterResponse register(String username, String rawPassword, String email, String fullName);
+
+    RegisterResponse createUserByAdmin(
+            String username,
+            String rawPassword,
+            String email,
+            String fullName,
+            String roleName,
+            Boolean isActive
+    );
 }

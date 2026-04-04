@@ -161,6 +161,7 @@ function UploadDashboard({ onLogout, onNavigate }) {
 
           <div className="sidebar-footer">
             <button type="button" className="menu-item">Security</button>
+            <button type="button" className="menu-item" onClick={() => onNavigate('/signup')}>Sign Up</button>
             <button type="button" className="menu-item" onClick={onLogout}>Log Out</button>
           </div>
         </aside>

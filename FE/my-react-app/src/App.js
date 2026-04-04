@@ -12,14 +12,15 @@ const VERSION_CONTROL_ROUTE = '/version-control';
 const VERSION_DETAIL_ROUTE = '/version-detail';
 
 const resolveRoute = (pathname) => {
+  const path = pathname.split('?')[0];
   if (
-    pathname === DASHBOARD_ROUTE ||
-    pathname === VERSION_CONTROL_ROUTE ||
-    pathname === VERSION_DETAIL_ROUTE
+    path === DASHBOARD_ROUTE ||
+    path === VERSION_CONTROL_ROUTE ||
+    path === VERSION_DETAIL_ROUTE
   ) {
-    return pathname;
+    return path;
   }
-  if (pathname === SIGNUP_ROUTE) return SIGNUP_ROUTE;
+  if (path === SIGNUP_ROUTE) return SIGNUP_ROUTE;
 
   return LOGIN_ROUTE;
 };
@@ -61,9 +62,16 @@ function App() {
   if (currentRoute === VERSION_DETAIL_ROUTE) {
     return <VersionDetail onNavigate={navigateTo} />;
   }
+  if (currentRoute === SIGNUP_ROUTE) {
+    return <SignUpPage onNavigate={() => navigateTo(LOGIN_ROUTE)} />;
+  }
 
-  // return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
-  return <UploadDashboard/>;
+  // if (currentRoute === LOGIN_ROUTE) {
+  //   return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)} />;
+  // }
+
+  return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
+  // return <UploadDashboard onLogout={() => navigateTo(LOGIN_ROUTE)} onNavigate={navigateTo} />;
 }
 
 export default App;

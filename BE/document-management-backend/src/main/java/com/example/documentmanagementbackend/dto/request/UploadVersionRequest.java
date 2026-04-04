@@ -8,11 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class UploadVersionRequest {
 
-    @NotBlank(message = "username is required")
-    private String username;
-
-    @NotBlank(message = "password is required")
-    private String password;
+    @NotBlank(message = "commitMessage is required")
+    private String commitMessage;
 }

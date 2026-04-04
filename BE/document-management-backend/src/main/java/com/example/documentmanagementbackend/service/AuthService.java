@@ -1,9 +1,19 @@
 package com.example.documentmanagementbackend.service;
 
-import com.example.documentmanagementbackend.dto.request.LoginRequest;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
+import com.example.documentmanagementbackend.dto.response.LoginResponse;
+import com.example.documentmanagementbackend.dto.response.RegisterResponse;
 
 public interface AuthService {
-    ResponseEntity<String> login(LoginRequest request);
+    LoginResponse login(String username, String password);
+
+    RegisterResponse register(String username, String rawPassword, String email, String fullName);
+
+    RegisterResponse createUserByAdmin(
+            String username,
+            String rawPassword,
+            String email,
+            String fullName,
+            String roleName,
+            Boolean isActive
+    );
 }

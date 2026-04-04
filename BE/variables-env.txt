@@ -1,0 +1,6 @@
+IMAGEKIT_PUBLIC_KEY=public_3fgytmSM5fFobfecBEvBFTp2w88=
+IMAGEKIT_PRIVATE_KEY=private_my6MNa7NalAA+old66eyYP5LqE8=
+IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/6dozttd2u
+DB_URL=jdbc:postgresql://ep-small-sunset-a1xyoric-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+DB_USER=neondb_owner
+DB_PASS=npg_5idwTzQuKG1F

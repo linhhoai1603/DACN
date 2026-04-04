@@ -1,16 +1,17 @@
 package com.example.documentmanagementbackend.repository;
 
-import com.example.documentmanagementbackend.model.User;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import com.example.documentmanagementbackend.entity.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User,Long> {
-    Optional<User> findByEmail(String email);
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByPhone(String phone);
+    @EntityGraph(attributePaths = {"roles", "roles.permissions"})
+    Optional<User> findByUsername(String username);
 
-    Optional<User> findUserByEmail(@NotBlank(message = "Email là bắt buộc") @Email(message = "Email không hợp lệ") String email);
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }

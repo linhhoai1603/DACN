@@ -45,35 +45,18 @@ jobs:
           script_stop: true
           envs: ENV_FILE_CONTENT
           script: |
-            set -e
-            mkdir -p /home/ec2-user/app
             cd /home/ec2-user/app
 
-            # 1. Tạo file .env
+            # Tạo file .env từ Secret
             printf "%s\n" "$ENV_FILE_CONTENT" > .env
-            chmod 600 .env
 
-            # 2. Kill process cũ trên port 8080
-            # Dùng sudo lsof để đảm bảo tìm thấy process của các user khác nếu có
-            PID=$(sudo lsof -ti:8080 || true)
-            if [ -n "$PID" ]; then
-              sudo kill -9 $PID
-              echo "Killed process on port 8080: $PID"
-            fi
+            # Dùng sed để dọn dẹp file .env nếu có ký tự lạ của Windows (\r)
+            sed -i 's/\r$//' .env
 
-            # 3. Tìm file JAR mới nhất
-            JAR_FILE=$(ls -t *.jar 2>/dev/null | head -n1)
-            if [ -z "$JAR_FILE" ]; then
-              echo "Error: No .jar file found!"
-              exit 1
-            fi
+            # Kill app cũ
+            sudo fuser -k 8080/tcp || true
 
-            # 4. Chạy ứng dụng với biến môi trường
-            # Nạp biến từ .env và chạy nohup
-            set -a
-            [ -f .env ] && . .env
-            set +a
-            
-            nohup java -jar "$JAR_FILE" > app.log 2>&1 &
-            
-            echo "Deployment successful. App is running: $JAR_FILE"
+            # LẤY GIÁ TRỊ TRỰC TIẾP TỪ .env VÀ CHẠY
+            # Cách này ép Java phải nhận biến ngay khi khởi động
+            export $(cat .env | xargs)
+            nohup java -jar *.jar > app.log 2>&1 &

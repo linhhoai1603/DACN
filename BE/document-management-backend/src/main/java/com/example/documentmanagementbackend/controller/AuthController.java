@@ -1,9 +1,8 @@
 package com.example.documentmanagementbackend.controller;
 
-
 import com.example.documentmanagementbackend.dto.request.LoginRequest;
+import com.example.documentmanagementbackend.dto.request.RegisterRequest;
 import com.example.documentmanagementbackend.service.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,18 +27,28 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             BindingResult bindingResult
     ) {
-        // 1. Bắt lỗi Validation ngay lập tức nếu có
         if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            // Lặp qua các trường bị lỗi và lấy ra thông báo lỗi đã định nghĩa trong DTO
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-
-            // Trả về HTTP 400 Bad Request kèm danh sách lỗi
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().body(buildErrors(bindingResult));
         }
-        System.out.println(request.getEmail());
         return authService.login(request);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(
+            @Valid @RequestBody RegisterRequest request,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(buildErrors(bindingResult));
+        }
+        return authService.register(request);
+    }
+
+    private Map<String, String> buildErrors(BindingResult bindingResult) {
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : bindingResult.getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        return errors;
     }
 }

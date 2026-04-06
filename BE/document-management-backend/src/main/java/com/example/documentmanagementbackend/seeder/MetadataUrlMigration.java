@@ -22,37 +22,46 @@ public class MetadataUrlMigration implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        // Migration disabled — URL/publicId are now stored correctly at upload time.
+        // Cloudinary secure_url already contains the extension in the public_id path.
+        // Re-enabling this would corrupt URLs by double-appending extensions.
+        System.out.println("[Migration] MetadataUrlMigration skipped (disabled).");
+
+        // One-time cleanup: fix records that were corrupted by previous migration runs
+        // (double extension like .pdf.pdf or .docx.docx)
+        fixDoubleExtensions();
+    }
+
+    private void fixDoubleExtensions() {
         List<DocumentMetadata> all = metadataRepository.findAll();
-        boolean anyUpdated = false;
+        boolean anyFixed = false;
 
         for (DocumentMetadata doc : all) {
             String ext = getExtension(doc.getFileName());
             if (ext.isEmpty()) continue;
 
-            boolean urlFixed = false;
-            boolean publicIdFixed = false;
+            String doubleExt = "." + ext + "." + ext;
+            boolean changed = false;
 
-            // Fix URL: nếu URL không kết thúc bằng extension
-            if (doc.getUrl() != null && !doc.getUrl().endsWith("." + ext)) {
-                doc.setUrl(doc.getUrl() + "." + ext);
-                urlFixed = true;
+            if (doc.getUrl() != null && doc.getUrl().endsWith(doubleExt)) {
+                doc.setUrl(doc.getUrl().substring(0, doc.getUrl().length() - ext.length() - 1));
+                changed = true;
             }
 
-            // Fix publicId: nếu publicId không kết thúc bằng extension
-            if (doc.getPublicId() != null && !doc.getPublicId().endsWith("." + ext)) {
-                doc.setPublicId(doc.getPublicId() + "." + ext);
-                publicIdFixed = true;
+            if (doc.getPublicId() != null && doc.getPublicId().endsWith(doubleExt)) {
+                doc.setPublicId(doc.getPublicId().substring(0, doc.getPublicId().length() - ext.length() - 1));
+                changed = true;
             }
 
-            if (urlFixed || publicIdFixed) {
+            if (changed) {
                 metadataRepository.save(doc);
-                anyUpdated = true;
-                System.out.println("[Migration] Fixed: " + doc.getFileName() + " → " + doc.getUrl());
+                anyFixed = true;
+                System.out.println("[Migration] Cleaned double-extension: " + doc.getFileName() + " → " + doc.getUrl());
             }
         }
 
-        if (!anyUpdated) {
-            System.out.println("[Migration] All records already have correct extensions. Skipping.");
+        if (!anyFixed) {
+            System.out.println("[Migration] No double-extension records found.");
         }
     }
 

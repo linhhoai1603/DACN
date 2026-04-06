@@ -26,35 +26,9 @@ public class CloudinaryAccessModeMigration implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        List<DocumentMetadata> all = metadataRepository.findAll();
-
-        for (DocumentMetadata doc : all) {
-            String ext = getExtension(doc.getFileName());
-            String publicId = doc.getPublicId();
-            // Cloudinary API cần publicId không có extension
-            if (!ext.isEmpty() && publicId.endsWith("." + ext)) {
-                publicId = publicId.substring(0, publicId.length() - ext.length() - 1);
-            }
-
-            try {
-                // Thử với publicId có extension trước
-                String pidToUse = publicId + "." + ext;
-                Map result;
-                try {
-                    result = cloudinary.api().update(pidToUse,
-                            ObjectUtils.asMap("resource_type", "raw", "type", "upload", "access_mode", "public"));
-                } catch (Exception e1) {
-                    // Thử không có extension
-                    result = cloudinary.api().update(publicId,
-                            ObjectUtils.asMap("resource_type", "raw", "type", "upload", "access_mode", "public"));
-                }
-                System.out.println("[CloudinaryMigration] Updated access_mode=public: " + doc.getFileName()
-                        + " → " + result.get("access_mode"));
-            } catch (Exception e) {
-                System.out.println("[CloudinaryMigration] Skipped: "
-                        + doc.getFileName() + " — " + e.getMessage());
-            }
-        }
+        // Migration disabled — files are uploaded as public (type=upload) already.
+        // Running this on every startup wastes Cloudinary Admin API quota.
+        System.out.println("[CloudinaryMigration] Skipped (disabled).");
     }
 
     private String getExtension(String filename) {

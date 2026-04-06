@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, Download, Share2, Clock, FileText, User, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Download, Share2, Clock, FileText, User, AlertCircle, Settings } from 'lucide-react';
 import './VersionControl.css';
 
 const VersionDetail = ({ onNavigate }) => {
@@ -13,7 +13,7 @@ const VersionDetail = ({ onNavigate }) => {
       role: 'Head of Finance',
       changedAt: 'Oct 24, 2024 • 14:22',
       comment: 'Updated financial highlights for Q3 and adjusted ESG section.',
-      status: 'current',
+      status: 'latest',
     },
     {
       version: 'v1.2',
@@ -46,9 +46,9 @@ const VersionDetail = ({ onNavigate }) => {
 
         <nav className="sidebar-nav">
           <div className="nav-item active"><FileText size={20} /> Documents</div>
-          <div className="nav-item"><Clock size={20} /> History</div>
-          <div className="nav-item"><Share2 size={20} /> Share</div>
-          <div className="nav-item"><User size={20} /> Team</div>
+          <div className="nav-item"><Share2 size={20} /> Shared</div>
+          <div className="nav-item"><Clock size={20} /> Recent</div>
+          <div className="nav-item"><Settings size={20} /> Settings</div>
         </nav>
 
         <div className="sidebar-user">

@@ -11,7 +11,7 @@ const LOGIN_ROUTE = '/login';
 const SIGNUP_ROUTE = '/signup';
 const DASHBOARD_ROUTE = '/upload';
 const VERSION_CONTROL_ROUTE = '/version-control';
-const VERSION_DETAIL_ROUTE = '/version-detail';
+export const VERSION_DETAIL_ROUTE = '/version-detail';
 const PREVIEW_ROUTE = '/preview';
 const UPDATE_DOCUMENT_ROUTE = '/update-document';
 

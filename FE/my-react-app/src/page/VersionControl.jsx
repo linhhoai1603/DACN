@@ -4,6 +4,7 @@ import {
     Bell, HelpCircle, ChevronLeft, ChevronRight, ListFilter, MoreHorizontal
 } from 'lucide-react';
 import './VersionControl.css';
+import { VERSION_DETAIL_ROUTE } from '../App.js';
 
 const API_BASE = 'http://localhost:8080';
 
@@ -78,10 +79,10 @@ const VersionControl = ({ onNavigate }) => {
                 </button>
 
                 <nav className="sidebar-nav">
-                    <div className="nav-item active"><FileText size={20}/> Documents</div>
-                    <div className="nav-item"><Share2 size={20}/> Shared</div>
-                    <div className="nav-item"><Clock size={20}/> Recent</div>
-                    <div className="nav-item"><Settings size={20}/> Settings</div>
+                    <div className="nav-item active"><FileText size={20} /> Documents</div>
+                    <div className="nav-item"><Share2 size={20} /> Shared</div>
+                    <div className="nav-item"><Clock size={20} /> Recent</div>
+                    <div className="nav-item"><Settings size={20} /> Settings</div>
                 </nav>
 
                 <div className="sidebar-user">
@@ -105,7 +106,7 @@ const VersionControl = ({ onNavigate }) => {
                     <div className="top-nav-right">
                         <Bell size={20} />
                         <HelpCircle size={20} />
-                        <div className="lang-select">VN <ChevronRight size={14}/></div>
+                        <div className="lang-select">VN <ChevronRight size={14} /></div>
                     </div>
                 </header>
 
@@ -141,18 +142,22 @@ const VersionControl = ({ onNavigate }) => {
                     {!loading && !error && documents.length > 0 && (
                         <table className="doc-table">
                             <thead>
-                            <tr>
-                                <th>FILENAME</th>
-                                <th>VERSION</th>
-                                <th>UPLOADED BY</th>
-                                <th>UPLOAD DATE/TIME</th>
-                                <th>SIZE</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>FILENAME</th>
+                                    <th>VERSION</th>
+                                    <th>UPLOADED BY</th>
+                                    <th>UPLOAD DATE/TIME</th>
+                                    <th>SIZE</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <tbody ref={menuRef}>
                             {documents.map((doc) => (
-                                <tr key={doc.id} className="clickable-row">
+                                <tr
+                                        key={doc.id}
+                                        className="clickable-row"
+                                        onClick={() => onNavigate(`${VERSION_DETAIL_ROUTE}?id=${doc.id}`)}
+                                  >
                                     <td>
                                         <div className="file-info">
                                             <div className="file-icon"><FileText size={18}/></div>

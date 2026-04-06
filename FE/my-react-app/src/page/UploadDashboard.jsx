@@ -1,25 +1,19 @@
-import {useMemo, useRef, useState} from 'react';
+import { useMemo, useRef, useState } from 'react';
 import './UploadDashboard.css';
 import DashboardLayout from "../component/DashboardLayout";
 
 const API_BASE = 'http://localhost:8080';
 
-function UploadDashboard({onLogout, onNavigate}) {
+function UploadDashboard({ onLogout, onNavigate }) {
     const fileInputRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
     const [queueItems, setQueueItems] = useState([]);
 
     const getIconClass = (fileName) => {
         const ext = fileName.split('.').pop()?.toLowerCase();
-        if (ext === 'pdf') {
-            return 'pdf';
-        }
-        if (ext === 'doc' || ext === 'docx') {
-            return 'doc';
-        }
-        if (ext === 'xls' || ext === 'xlsx' || ext === 'csv') {
-            return 'xls';
-        }
+        if (ext === 'pdf') return 'pdf';
+        if (ext === 'doc' || ext === 'docx') return 'doc';
+        if (ext === 'xls' || ext === 'xlsx' || ext === 'csv') return 'xls';
         return 'doc';
     };
 
@@ -27,7 +21,6 @@ function UploadDashboard({onLogout, onNavigate}) {
         if (!bytes || Number.isNaN(bytes)) {
             return '0 MB';
         }
-
         const mb = bytes / (1024 * 1024);
         if (mb < 0.1) {
             return `${mb.toFixed(2)} MB`;
@@ -46,9 +39,7 @@ function UploadDashboard({onLogout, onNavigate}) {
     }, [queueItems]);
 
     const pushFilesToQueue = (files) => {
-        if (!files || files.length === 0) {
-            return;
-        }
+        if (!files || files.length === 0) return;
 
         const mappedFiles = Array.from(files).map((file, index) => ({
             id: `${file.name}-${file.lastModified}-${index}`,
@@ -57,7 +48,7 @@ function UploadDashboard({onLogout, onNavigate}) {
             sizeLabel: formatBytes(file.size),
             status: 'Waiting',
             progress: 0,
-            file, // giữ File object để upload
+            file,
         }));
 
         setQueueItems((prev) => [...prev, ...mappedFiles]);
@@ -85,9 +76,7 @@ function UploadDashboard({onLogout, onNavigate}) {
     };
 
     const handleDragLeave = (event) => {
-        if (event.currentTarget.contains(event.relatedTarget)) {
-            return;
-        }
+        if (event.currentTarget.contains(event.relatedTarget)) return;
         setIsDragging(false);
     };
 
@@ -101,7 +90,7 @@ function UploadDashboard({onLogout, onNavigate}) {
 
     const updateItem = (id, patch) => {
         setQueueItems((prev) =>
-            prev.map((item) => (item.id === id ? {...item, ...patch} : item))
+            prev.map((item) => (item.id === id ? { ...item, ...patch } : item))
         );
     };
 
@@ -110,7 +99,7 @@ function UploadDashboard({onLogout, onNavigate}) {
         if (pending.length === 0) return;
 
         for (const item of pending) {
-            updateItem(item.id, {status: 'Uploading...', progress: 10});
+            updateItem(item.id, { status: 'Uploading...', progress: 10 });
 
             const formData = new FormData();
             formData.append('file', item.file);
@@ -120,7 +109,7 @@ function UploadDashboard({onLogout, onNavigate}) {
                 const token = localStorage.getItem('token');
                 const res = await fetch(`${API_BASE}/files/upload`, {
                     method: 'POST',
-                    headers: token ? {Authorization: `Bearer ${token}`} : {},
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
                     body: formData,
                 });
 
@@ -129,16 +118,15 @@ function UploadDashboard({onLogout, onNavigate}) {
                     throw new Error(msg || res.statusText);
                 }
 
-                updateItem(item.id, {status: 'Done', progress: 100});
+                updateItem(item.id, { status: 'Done', progress: 100 });
             } catch (err) {
-                updateItem(item.id, {status: `Failed: ${err.message}`, progress: 0});
+                updateItem(item.id, { status: `Failed: ${err.message}`, progress: 0 });
             }
         }
     };
 
     return (
         <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="documents">
-
             <section className="content">
                 <h2>Curation Hub</h2>
                 <p className="subtitle">
@@ -193,7 +181,7 @@ function UploadDashboard({onLogout, onNavigate}) {
                                     <p>{item.sizeLabel} • {item.status}</p>
                                     {item.progress > 0 && (
                                         <div className="progress-track">
-                                            <span style={{width: `${item.progress}%`}}/>
+                                            <span style={{ width: `${item.progress}%` }} />
                                         </div>
                                     )}
                                 </div>
@@ -209,8 +197,8 @@ function UploadDashboard({onLogout, onNavigate}) {
                             </p>
                             <div className="queue-actions">
                                 <button type="button" className="btn-ghost" onClick={handleClearQueue}>Clear</button>
-                                <button type="button" className="btn-upload-primary" onClick={handleUploadAll}>Upload
-                                    All
+                                <button type="button" className="btn-upload-primary" onClick={handleUploadAll}>
+                                    Upload All
                                 </button>
                             </div>
                         </div>

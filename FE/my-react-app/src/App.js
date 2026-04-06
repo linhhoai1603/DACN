@@ -7,6 +7,9 @@ import VersionControl from './page/VersionControl';
 // import DocumentPreview from './page/DocumentPreview';
 // import UpdateDocument from './page/UpdateDocument';
 import DashboardPage from "./page/DashboardPage";
+import VersionDetail from './page/Version-Detail';
+import DocumentPreview from './page/DocumentPreview';
+import UpdateDocument from './page/UpdateDocument';
 
 const LOGIN_ROUTE = '/login';
 const SIGNUP_ROUTE = '/signup';
@@ -29,31 +32,33 @@ const resolveRoute = (pathname) => {
   ) {
     return pathname;
   }
-  return DASHBOARD_ROUTE;
+  return LOGIN_ROUTE;
+
 };
 
 function App() {
   const [currentRoute, setCurrentRoute] = useState(() => resolveRoute(window.location.pathname));
+  const [selectedDoc, setSelectedDoc] = useState(null);
 
   useEffect(() => {
     const normalized = resolveRoute(window.location.pathname);
     if (window.location.pathname !== normalized) {
       window.history.replaceState({}, '', normalized);
     }
-
     const handlePopState = () => {
       setCurrentRoute(resolveRoute(window.location.pathname));
     };
-
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const navigateTo = (route) => {
+  const navigateTo = (route, state = null) => {
     if (window.location.pathname !== route) {
       window.history.pushState({}, '', route);
     }
-    setCurrentRoute(route);
+    if (state !== null) setSelectedDoc(state);
+    const pathname = route.split('?')[0];
+    setCurrentRoute(pathname);
   };
 
   if (currentRoute === SIGNUP_ROUTE) {
@@ -65,24 +70,20 @@ function App() {
   if (currentRoute === VERSION_CONTROL_ROUTE) {
     return <VersionControl onNavigate={navigateTo} />;
   }
-  // if (currentRoute === VERSION_DETAIL_ROUTE) {
-  //   return <VersionDetail onNavigate={navigateTo} />;
-  // }
-  // if (currentRoute === PREVIEW_ROUTE) {
-  //   return <DocumentPreview onNavigate={navigateTo} />;
-  // }
-  // if (currentRoute === UPDATE_DOCUMENT_ROUTE) {
-  //   return <UpdateDocument onNavigate={navigateTo} doc={selectedDoc} />;
-  // }
+  if (currentRoute === VERSION_DETAIL_ROUTE) {
+    return <VersionDetail onNavigate={navigateTo} />;
+  }
+  if (currentRoute === PREVIEW_ROUTE) {
+    return <DocumentPreview onNavigate={navigateTo} />;
+  }
+  if (currentRoute === UPDATE_DOCUMENT_ROUTE) {
+    return <UpdateDocument onNavigate={navigateTo} doc={selectedDoc} />;
+  }
   if (currentRoute === DASHBOARD) {
     return <DashboardPage onNavigate={navigateTo} />;
   }
 
-  // return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)} />;
-
-
-
-  return <DashboardPage onNavigate={navigateTo} />;
+  return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)} />;
 }
 
 export default App;

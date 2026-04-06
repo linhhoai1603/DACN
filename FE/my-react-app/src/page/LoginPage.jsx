@@ -1,49 +1,38 @@
 import React, { useState } from 'react';
-import { Shield, CloudSync, Lock, User, Phone, Eye } from 'lucide-react';
+import { Shield, CloudSync, Lock, User, Phone, Eye, EyeOff } from 'lucide-react';
 import './Loginpage.css';
 
-const API_BASE = 'http://localhost:8080';
-
 const LoginPage = ({ onSignIn, onNavigateSignUp }) => {
-    const [form, setForm] = useState({ email: '', phoneNumber: '', password: '' });
+    const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
 
-    const handleChange = (e) => {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleSignIn = async (e) => {
+        e.preventDefault();
         setError('');
-    };
-
-    const handleSubmit = async () => {
         setLoading(true);
-        setError('');
+
         try {
-            const res = await fetch(`${API_BASE}/auth/login`, {
+            const response = await fetch('http://localhost:8080/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify({ email, phoneNumber, password }),
             });
 
-            const data = await res.text();
-
-            if (!res.ok) {
-                // data có thể là plain string lỗi hoặc JSON validation errors
-                try {
-                    const parsed = JSON.parse(data);
-                    const messages = Object.values(parsed).join(', ');
-                    setError(messages);
-                } catch {
-                    setError(data || 'Login failed');
-                }
+            if (!response.ok) {
+                const message = await response.text();
+                setError(message || 'Đăng nhập thất bại');
                 return;
             }
 
-            // data là JWT token
-            localStorage.setItem('token', data);
+            const token = await response.text();
+            localStorage.setItem('token', token);
             onSignIn();
-        } catch {
-            setError('Cannot connect to server. Please try again.');
+        } catch (err) {
+            setError('Không thể kết nối đến server');
         } finally {
             setLoading(false);
         }
@@ -54,28 +43,23 @@ const LoginPage = ({ onSignIn, onNavigateSignUp }) => {
             <header className="main-header">
                 <div className="logo">DocuManage</div>
                 <div className="header-right">
-                    <a href="" className="help-link">Help</a>
-                    <button className="btn-signup-header" onClick={onNavigateSignUp}>
-                        Sign Up
-                    </button>
+                    <a href="#" className="help-link">Help</a>
+                    <button className="btn-signup-header" onClick={onNavigateSignUp}>Sign Up</button>
                 </div>
             </header>
 
             <div className="login-page-wrapper">
-            {/* Cột trái - Branding */}
+                {/* Cột trái - Branding */}
                 <div className="branding-section">
                     <div className="badge-security">
                         <Shield size={16} /> Enterprise Grade Security
                     </div>
-
                     <h1 className="hero-title">
                         Streamline Your<br />Document Lifecycle
                     </h1>
-
                     <p className="hero-subtitle">
                         The next generation of document management for modern enterprises.
                     </p>
-
                     <div className="feature-cards-row">
                         <div className="feature-card">
                             <CloudSync size={24} />
@@ -94,20 +78,20 @@ const LoginPage = ({ onSignIn, onNavigateSignUp }) => {
                         <h2 className="form-heading">Welcome Back</h2>
                         <p className="form-desc">Enter your credentials to access your workspace.</p>
 
-                        {error && <div className="error-banner">{error}</div>}
+                        {error && <p className="error-message">{error}</p>}
 
-                        <form className="login-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+                        <form className="login-form" onSubmit={handleSignIn}>
                             <div className="input-group">
-                                <label>Username (Email)</label>
+                                <label>Email</label>
                                 <div className="input-wrapper">
                                     <User className="icon-left" size={18} />
                                     <input
-                                        type="text"
-                                        name="email"
+                                        type="email"
                                         className="input-field"
                                         placeholder="j.doe@company.com"
-                                        value={form.email}
-                                        onChange={handleChange}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
                                     />
                                 </div>
                             </div>
@@ -116,14 +100,13 @@ const LoginPage = ({ onSignIn, onNavigateSignUp }) => {
                                 <label>Phone Number</label>
                                 <div className="input-wrapper">
                                     <Phone className="icon-left" size={18} />
-
                                     <input
                                         type="text"
-                                        name="phoneNumber"
                                         className="input-field"
                                         placeholder="0912345678"
-                                        value={form.phoneNumber}
-                                        onChange={handleChange}
+                                        value={phoneNumber}
+                                        onChange={(e) => setPhoneNumber(e.target.value)}
+                                        required
                                     />
                                 </div>
                             </div>
@@ -134,18 +117,20 @@ const LoginPage = ({ onSignIn, onNavigateSignUp }) => {
                                     <Lock className="icon-left" size={18} />
                                     <input
                                         type={showPassword ? 'text' : 'password'}
-                                        name="password"
                                         className="input-field"
                                         placeholder="••••••••"
-                                        value={form.password}
-                                        onChange={handleChange}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
                                     />
-                                    <Eye
-                                        className="icon-right"
-                                        size={18}
-                                        style={{ cursor: 'pointer' }}
-                                        onClick={() => setShowPassword((v) => !v)}
-                                    />
+                                    <button
+                                        type="button"
+                                        className="icon-right icon-btn"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        aria-label="Toggle password visibility"
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
                                 </div>
                             </div>
 
@@ -153,6 +138,13 @@ const LoginPage = ({ onSignIn, onNavigateSignUp }) => {
                                 {loading ? 'Signing in...' : 'Sign In'}
                             </button>
                         </form>
+
+                        <p className="form-desc" style={{ marginTop: '16px', textAlign: 'center' }}>
+                            Chưa có tài khoản?{' '}
+                            <button type="button" className="link-btn" onClick={onNavigateSignUp}>
+                                Sign Up
+                            </button>
+                        </p>
                     </div>
                 </div>
             </div>

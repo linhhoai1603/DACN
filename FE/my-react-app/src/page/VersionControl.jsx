@@ -75,14 +75,15 @@ const VersionControl = ({ onNavigate, onLogout }) => {
 
     return (
         <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="version-control">
-
             <div className="content-header">
                 <div className="title-section">
                     <h1>Document Management System</h1>
                 </div>
                 <div className="action-buttons">
                     <button className="btn-export">Export Report</button>
-                    <button className="btn-filter"><ListFilter size={18} />Filter Documents</button>
+                    <button className="btn-filter">
+                        <ListFilter size={18} /> Filter Documents
+                    </button>
                 </div>
             </div>
 

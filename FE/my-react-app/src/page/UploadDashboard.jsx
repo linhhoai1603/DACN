@@ -116,8 +116,10 @@ function UploadDashboard({ onLogout, onNavigate }) {
       formData.append('commitMessage', 'init file');
 
       try {
+        const token = localStorage.getItem('token');
         const res = await fetch(`${API_BASE}/files/upload`, {
           method: 'POST',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
           body: formData,
         });
 

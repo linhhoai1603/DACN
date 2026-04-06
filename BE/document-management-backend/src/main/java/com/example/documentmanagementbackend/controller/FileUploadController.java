@@ -18,14 +18,34 @@ public class FileUploadController {
         this.fileUploadService = fileUploadService;
     }
 
+    /**
+     * Upload file mới lần đầu.
+     * POST /files/upload
+     * Dùng bởi: UploadDashboard
+     */
     @PostMapping("/upload")
     public ResponseEntity<FileUploadResponse> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "commitMessage", required = false) String commitMessage,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String uploadedBy = (userDetails != null) ? userDetails.getUsername() : "anonymous";
-        FileUploadResponse response = fileUploadService.upload(file, uploadedBy, commitMessage);
-        return ResponseEntity.ok(response);
+        String uploadedBy = userDetails != null ? userDetails.getUsername() : "anonymous";
+        return ResponseEntity.ok(fileUploadService.upload(file, uploadedBy, commitMessage));
+    }
+
+    /**
+     * Update version mới cho document đã tồn tại.
+     * PUT /files/{id}/update
+     * Dùng bởi: UpdateDocument
+     */
+    @PutMapping("/{id}/update")
+    public ResponseEntity<FileUploadResponse> updateVersion(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "commitMessage", required = false) String commitMessage,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        String uploadedBy = userDetails != null ? userDetails.getUsername() : "anonymous";
+        return ResponseEntity.ok(fileUploadService.updateVersion(id, file, uploadedBy, commitMessage));
     }
 }

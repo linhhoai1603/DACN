@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     FileText, Share2, Clock, Settings, Plus, Search,
-    Bell, HelpCircle, Eye, ChevronLeft, ChevronRight, ListFilter
+    Bell, HelpCircle, ChevronLeft, ChevronRight, ListFilter, MoreHorizontal
 } from 'lucide-react';
 import './VersionControl.css';
 
@@ -11,21 +11,30 @@ const VersionControl = ({ onNavigate }) => {
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [openMenuId, setOpenMenuId] = useState(null);
+    const menuRef = useRef(null);
 
     useEffect(() => {
-        fetch(`${API_BASE}/files`)
+        const token = localStorage.getItem('token');
+        fetch(`${API_BASE}/files`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
             .then((res) => {
                 if (!res.ok) throw new Error(`Failed to load documents (${res.status})`);
                 return res.json();
             })
-            .then((data) => {
-                setDocuments(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                setError(err.message);
-                setLoading(false);
-            });
+            .then((data) => { setDocuments(data); setLoading(false); })
+            .catch((err) => { setError(err.message); setLoading(false); });
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setOpenMenuId(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const formatDate = (isoStr) => {
@@ -42,12 +51,27 @@ const VersionControl = ({ onNavigate }) => {
         return mb < 1 ? `${(bytes / 1024).toFixed(1)} KB` : `${mb.toFixed(1)} MB`;
     };
 
+    const handleToggleMenu = (e, docId) => {
+        e.stopPropagation();
+        setOpenMenuId((prev) => (prev === docId ? null : docId));
+    };
+
+    const handleView = (e, doc) => {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        onNavigate(`/preview?id=${doc.id}`);
+    };
+
+    const handleUpdate = (e, doc) => {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        onNavigate('/update-document', doc);
+    };
+
     return (
         <div className="dashboard-container">
             <aside className="sidebar">
-                <div className="sidebar-brand">
-                    <h2>DocuManage</h2>
-                </div>
+                <div className="sidebar-brand"><h2>DocuManage</h2></div>
 
                 <button className="btn-upload" onClick={() => onNavigate('/upload')}>
                     <Plus size={20} /> Upload Document
@@ -91,27 +115,23 @@ const VersionControl = ({ onNavigate }) => {
                     </div>
                     <div className="action-buttons">
                         <button className="btn-export">Export Report</button>
-                        <button className="btn-filter"><ListFilter size={18} />Filter Documents</button>
+                        <button className="btn-filter"><ListFilter size={18}/>Filter Documents</button>
                     </div>
                 </div>
 
                 <div className="table-card">
-                    <div className="table-header">
-                        <h3>Active Files</h3>
-                    </div>
+                    <div className="table-header"><h3>Active Files</h3></div>
 
                     {loading && (
                         <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
                             Loading documents...
                         </div>
                     )}
-
                     {error && (
                         <div style={{ padding: '40px', textAlign: 'center', color: '#ef4444' }}>
-                            ⚠ {error}
+                            {error}
                         </div>
                     )}
-
                     {!loading && !error && documents.length === 0 && (
                         <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
                             No documents uploaded yet.
@@ -130,7 +150,7 @@ const VersionControl = ({ onNavigate }) => {
                                 <th></th>
                             </tr>
                             </thead>
-                            <tbody>
+                            <tbody ref={menuRef}>
                             {documents.map((doc) => (
                                 <tr key={doc.id} className="clickable-row">
                                     <td>
@@ -138,7 +158,7 @@ const VersionControl = ({ onNavigate }) => {
                                             <div className="file-icon"><FileText size={18}/></div>
                                             <div>
                                                 <strong>{doc.fileName}</strong>
-                                                <p>{doc.fileType?.toUpperCase()} • {doc.commitMessage}</p>
+                                                <p>{doc.fileType?.toUpperCase()}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -148,14 +168,26 @@ const VersionControl = ({ onNavigate }) => {
                                     <td>{doc.uploadedBy}</td>
                                     <td>{formatDate(doc.uploadedAt)}</td>
                                     <td>{formatBytes(doc.fileSize)}</td>
-                                    <td>
-                                        <button
-                                            className="btn-preview-icon"
-                                            title="Preview document"
-                                            onClick={() => onNavigate(`/preview?id=${doc.id}`)}
-                                        >
-                                            <Eye size={18} className="icon-view"/>
-                                        </button>
+                                    <td className="action-cell">
+                                        <div className="row-menu-wrapper">
+                                            <button
+                                                className="btn-more"
+                                                title="Actions"
+                                                onClick={(e) => handleToggleMenu(e, doc.id)}
+                                            >
+                                                <MoreHorizontal size={18} />
+                                            </button>
+                                            {openMenuId === doc.id && (
+                                                <div className="row-dropdown">
+                                                    <button onClick={(e) => handleView(e, doc)}>
+                                                        View
+                                                    </button>
+                                                    <button onClick={(e) => handleUpdate(e, doc)}>
+                                                        Update
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

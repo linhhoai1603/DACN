@@ -4,6 +4,7 @@ import {
     Bell, HelpCircle, Eye, ChevronLeft, ChevronRight, ListFilter
 } from 'lucide-react';
 import './VersionControl.css';
+import { VERSION_DETAIL_ROUTE } from '../App.js';
 
 const API_BASE = 'http://localhost:8080';
 
@@ -54,10 +55,10 @@ const VersionControl = ({ onNavigate }) => {
                 </button>
 
                 <nav className="sidebar-nav">
-                    <div className="nav-item active"><FileText size={20}/> Documents</div>
-                    <div className="nav-item"><Share2 size={20}/> Shared</div>
-                    <div className="nav-item"><Clock size={20}/> Recent</div>
-                    <div className="nav-item"><Settings size={20}/> Settings</div>
+                    <div className="nav-item active"><FileText size={20} /> Documents</div>
+                    <div className="nav-item"><Share2 size={20} /> Shared</div>
+                    <div className="nav-item"><Clock size={20} /> Recent</div>
+                    <div className="nav-item"><Settings size={20} /> Settings</div>
                 </nav>
 
                 <div className="sidebar-user">
@@ -81,7 +82,7 @@ const VersionControl = ({ onNavigate }) => {
                     <div className="top-nav-right">
                         <Bell size={20} />
                         <HelpCircle size={20} />
-                        <div className="lang-select">VN <ChevronRight size={14}/></div>
+                        <div className="lang-select">VN <ChevronRight size={14} /></div>
                     </div>
                 </header>
 
@@ -121,44 +122,51 @@ const VersionControl = ({ onNavigate }) => {
                     {!loading && !error && documents.length > 0 && (
                         <table className="doc-table">
                             <thead>
-                            <tr>
-                                <th>FILENAME</th>
-                                <th>VERSION</th>
-                                <th>UPLOADED BY</th>
-                                <th>UPLOAD DATE/TIME</th>
-                                <th>SIZE</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>FILENAME</th>
+                                    <th>VERSION</th>
+                                    <th>UPLOADED BY</th>
+                                    <th>UPLOAD DATE/TIME</th>
+                                    <th>SIZE</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <tbody>
-                            {documents.map((doc) => (
-                                <tr key={doc.id} className="clickable-row">
-                                    <td>
-                                        <div className="file-info">
-                                            <div className="file-icon"><FileText size={18}/></div>
-                                            <div>
-                                                <strong>{doc.fileName}</strong>
-                                                <p>{doc.fileType?.toUpperCase()} • {doc.commitMessage}</p>
+                                {documents.map((doc) => (
+                                    <tr
+                                        key={doc.id}
+                                        className="clickable-row"
+                                        onClick={() => onNavigate(`${VERSION_DETAIL_ROUTE}?id=${doc.id}`)}
+                                    >
+                                        <td>
+                                            <div className="file-info">
+                                                <div className="file-icon"><FileText size={18} /></div>
+                                                <div>
+                                                    <strong>{doc.fileName}</strong>
+                                                    <p>{doc.fileType?.toUpperCase()} • {doc.commitMessage}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="status-badge completed">{doc.version}</span>
-                                    </td>
-                                    <td>{doc.uploadedBy}</td>
-                                    <td>{formatDate(doc.uploadedAt)}</td>
-                                    <td>{formatBytes(doc.fileSize)}</td>
-                                    <td>
-                                        <button
-                                            className="btn-preview-icon"
-                                            title="Preview document"
-                                            onClick={() => onNavigate(`/preview?id=${doc.id}`)}
-                                        >
-                                            <Eye size={18} className="icon-view"/>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td>
+                                            <span className="status-badge completed">{doc.version}</span>
+                                        </td>
+                                        <td>{doc.uploadedBy}</td>
+                                        <td>{formatDate(doc.uploadedAt)}</td>
+                                        <td>{formatBytes(doc.fileSize)}</td>
+                                        <td>
+                                            <button
+                                                className="btn-preview-icon"
+                                                title="Preview document"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onNavigate(`/preview?id=${doc.id}`)
+                                                }}
+                                            >
+                                                <Eye size={18} className="icon-view" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     )}

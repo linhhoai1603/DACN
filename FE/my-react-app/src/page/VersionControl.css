@@ -321,3 +321,24 @@
     border-color: #94a3b8;
     color: #003d99;
 }
+
+/* Preview button in table */
+.btn-preview-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.btn-preview-icon:hover {
+    background: #eff6ff;
+}
+
+.btn-preview-icon:hover .icon-view {
+    color: #2563eb;
+}

@@ -43,14 +43,15 @@ public class FileUploadService {
         int versionNumber = existing.size() + 1;
         String version = "v" + versionNumber;
 
-        // public_id trên Cloudinary: tên file + version để tránh ghi đè
-        String publicId = "documents/" + stripExtension(originalFilename) + "_" + version;
+        // public_id trên Cloudinary: giữ extension để Cloudinary trả đúng Content-Type khi download/preview
+        String publicId = "documents/" + stripExtension(originalFilename) + "_" + version + "." + ext;
 
         try {
             Map uploadResult = cloudinary.uploader().upload(
                     file.getBytes(),
                     ObjectUtils.asMap(
                             "resource_type", "raw",
+                            "type", "upload",
                             "public_id", publicId,
                             "use_filename", false,
                             "unique_filename", false

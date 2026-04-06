@@ -1,27 +1,55 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import {
     FileText, Share2, Clock, Settings, Plus, Search,
     Bell, HelpCircle, Eye, ChevronLeft, ChevronRight, ListFilter
 } from 'lucide-react';
 import './VersionControl.css';
 
+const API_BASE = 'http://localhost:8080';
+
 const VersionControl = ({ onNavigate }) => {
-    const documents = [
-        { name: 'Q3_Financial_Review.pdf', size: '2.4 MB', type: 'PDF Document', status: 'COMPLETED', user: 'Alex Riviera', date: 'Oct 24, 2023' },
-        { name: 'Contract_Draft_V4.docx', size: '840 KB', type: 'Word Document', status: 'PENDING', user: 'Sarah Jenkins', date: 'Oct 23, 2023' },
-        { name: 'Invoice_Archive_2022.zip', size: '154.2 MB', type: 'Archive', status: 'FAILED', user: 'Mark K.', date: 'Oct 22, 2023' },
-        { name: 'Blueprint_Modern_Villa.dwg', size: '12.8 MB', type: 'CAD File', status: 'COMPLETED', user: 'David Chen', date: 'Oct 21, 2023' },
-    ];
+    const [documents, setDocuments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetch(`${API_BASE}/files`)
+            .then((res) => {
+                if (!res.ok) throw new Error(`Failed to load documents (${res.status})`);
+                return res.json();
+            })
+            .then((data) => {
+                setDocuments(data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                setError(err.message);
+                setLoading(false);
+            });
+    }, []);
+
+    const formatDate = (isoStr) => {
+        if (!isoStr) return '—';
+        return new Date(isoStr).toLocaleString('vi-VN', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit',
+        });
+    };
+
+    const formatBytes = (bytes) => {
+        if (!bytes) return '—';
+        const mb = bytes / (1024 * 1024);
+        return mb < 1 ? `${(bytes / 1024).toFixed(1)} KB` : `${mb.toFixed(1)} MB`;
+    };
 
     return (
         <div className="dashboard-container">
-            {/* 1. SIDEBAR */}
             <aside className="sidebar">
                 <div className="sidebar-brand">
                     <h2>DocuManage</h2>
                 </div>
 
-                <button className="btn-upload">
+                <button className="btn-upload" onClick={() => onNavigate('/upload')}>
                     <Plus size={20} /> Upload Document
                 </button>
 
@@ -41,11 +69,9 @@ const VersionControl = ({ onNavigate }) => {
                 </div>
             </aside>
 
-            {/* 2. MAIN AREA */}
             <main className="main-area">
-                {/* Top Header */}
                 <header className="top-nav">
-                    <button className="btn-back" onClick={() => onNavigate('/dashboard')}>
+                    <button className="btn-back" onClick={() => onNavigate('/upload')}>
                         <ChevronLeft size={20} /> Back to Dashboard
                     </button>
                     <div className="search-bar">
@@ -59,11 +85,9 @@ const VersionControl = ({ onNavigate }) => {
                     </div>
                 </header>
 
-                {/* Page Title */}
                 <div className="content-header">
                     <div className="title-section">
                         <h1>Document Management System</h1>
-
                     </div>
                     <div className="action-buttons">
                         <button className="btn-export">Export Report</button>
@@ -71,46 +95,73 @@ const VersionControl = ({ onNavigate }) => {
                     </div>
                 </div>
 
-                {/* Table Area */}
                 <div className="table-card">
                     <div className="table-header">
                         <h3>Active Files</h3>
                     </div>
 
-                    <table className="doc-table">
-                        <thead>
-                        <tr>
-                            <th>FILENAME</th>
-                            <th>STATUS</th>
-                            <th>CREATED BY</th>
-                            <th>UPLOAD DATE/TIME</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {documents.map((doc, index) => (
-                            <tr
-                            key={index}
-                            className="clickable-row"
-                            onClick={() => onNavigate(`/version-detail?file=${encodeURIComponent(doc.name)}`)}
-                        >
-                            <td>
-                                <div className="file-info">
-                                    <div className="file-icon"><FileText size={18}/></div>
-                                    <div>
-                                        <strong>{doc.name}</strong>
-                                        <p>{doc.size} • {doc.type}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span className={`status-badge ${doc.status.toLowerCase()}`}>{doc.status}</span></td>
-                            <td>{doc.user}</td>
-                            <td>{doc.date}</td>
-                            <td><Eye size={18} className="icon-view"/></td>
-                        </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                    {loading && (
+                        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                            Loading documents...
+                        </div>
+                    )}
+
+                    {error && (
+                        <div style={{ padding: '40px', textAlign: 'center', color: '#ef4444' }}>
+                            ⚠ {error}
+                        </div>
+                    )}
+
+                    {!loading && !error && documents.length === 0 && (
+                        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                            No documents uploaded yet.
+                        </div>
+                    )}
+
+                    {!loading && !error && documents.length > 0 && (
+                        <table className="doc-table">
+                            <thead>
+                            <tr>
+                                <th>FILENAME</th>
+                                <th>VERSION</th>
+                                <th>UPLOADED BY</th>
+                                <th>UPLOAD DATE/TIME</th>
+                                <th>SIZE</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {documents.map((doc) => (
+                                <tr key={doc.id} className="clickable-row">
+                                    <td>
+                                        <div className="file-info">
+                                            <div className="file-icon"><FileText size={18}/></div>
+                                            <div>
+                                                <strong>{doc.fileName}</strong>
+                                                <p>{doc.fileType?.toUpperCase()} • {doc.commitMessage}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span className="status-badge completed">{doc.version}</span>
+                                    </td>
+                                    <td>{doc.uploadedBy}</td>
+                                    <td>{formatDate(doc.uploadedAt)}</td>
+                                    <td>{formatBytes(doc.fileSize)}</td>
+                                    <td>
+                                        <button
+                                            className="btn-preview-icon"
+                                            title="Preview document"
+                                            onClick={() => onNavigate(`/preview?id=${doc.id}`)}
+                                        >
+                                            <Eye size={18} className="icon-view"/>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
             </main>
         </div>

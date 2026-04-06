@@ -3,21 +3,23 @@ import LoginPage from './page/LoginPage';
 import UploadDashboard from './page/UploadDashboard';
 import VersionControl from './page/VersionControl';
 import VersionDetail from './page/Version-Detail';
+import DocumentPreview from './page/DocumentPreview';
 
 const LOGIN_ROUTE = '/login';
 const DASHBOARD_ROUTE = '/upload';
 const VERSION_CONTROL_ROUTE = '/version-control';
 const VERSION_DETAIL_ROUTE = '/version-detail';
+const PREVIEW_ROUTE = '/preview';
 
 const resolveRoute = (pathname) => {
   if (
     pathname === DASHBOARD_ROUTE ||
     pathname === VERSION_CONTROL_ROUTE ||
-    pathname === VERSION_DETAIL_ROUTE
+    pathname === VERSION_DETAIL_ROUTE ||
+    pathname === PREVIEW_ROUTE
   ) {
     return pathname;
   }
-
   return LOGIN_ROUTE;
 };
 
@@ -57,6 +59,10 @@ function App() {
 
   if (currentRoute === VERSION_DETAIL_ROUTE) {
     return <VersionDetail onNavigate={navigateTo} />;
+  }
+
+  if (currentRoute === PREVIEW_ROUTE) {
+    return <DocumentPreview onNavigate={navigateTo} />;
   }
 
   return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;

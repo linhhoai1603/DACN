@@ -5,7 +5,7 @@ import VersionControl from './page/VersionControl';
 import VersionDetail from './page/Version-Detail';
 
 const LOGIN_ROUTE = '/login';
-const DASHBOARD_ROUTE = '/dashboard';
+const DASHBOARD_ROUTE = '/upload';
 const VERSION_CONTROL_ROUTE = '/version-control';
 const VERSION_DETAIL_ROUTE = '/version-detail';
 

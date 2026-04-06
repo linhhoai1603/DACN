@@ -113,6 +113,7 @@ function UploadDashboard({ onLogout, onNavigate }) {
 
       const formData = new FormData();
       formData.append('file', item.file);
+      formData.append('commitMessage', 'init file');
 
       try {
         const res = await fetch(`${API_BASE}/files/upload`, {

@@ -342,3 +342,65 @@
 .btn-preview-icon:hover .icon-view {
     color: #2563eb;
 }
+
+/* ── Row action menu (3-dot) ── */
+.action-cell {
+    position: relative;
+    width: 48px;
+    text-align: center;
+}
+
+.row-menu-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-more {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.btn-more:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.row-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    min-width: 130px;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.row-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.row-dropdown button:hover {
+    background: #f1f5f9;
+    color: #0052cc;
+}

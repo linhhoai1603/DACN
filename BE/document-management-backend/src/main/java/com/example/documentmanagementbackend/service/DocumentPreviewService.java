@@ -47,7 +47,7 @@ public class DocumentPreviewService {
                 doc.getUploadedBy(),
                 doc.getUploadedAt(),
                 doc.getCommitMessage(),
-                doc.getVersion(),
+                doc.getVersion(),   // đã là string "v1", "v2", ...
                 ext,
                 previewUrl
         );

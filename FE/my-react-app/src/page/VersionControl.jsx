@@ -1,112 +1,172 @@
-import React from 'react';
-import {
-    FileText, Share2, Clock, Settings, Plus, Search,
-    Bell, HelpCircle, Eye, ChevronLeft, ChevronRight, ListFilter
-} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { FileText, ListFilter, MoreHorizontal } from 'lucide-react';
 import './VersionControl.css';
+import DashboardLayout from "../component/DashboardLayout";
+import { VERSION_DETAIL_ROUTE } from '../App.js';
 
-const VersionControl = () => {
-    const documents = [
-        { name: 'Q3_Financial_Review.pdf', size: '2.4 MB', type: 'PDF Document', status: 'COMPLETED', user: 'Alex Riviera', date: 'Oct 24, 2023' },
-        { name: 'Contract_Draft_V4.docx', size: '840 KB', type: 'Word Document', status: 'PENDING', user: 'Sarah Jenkins', date: 'Oct 23, 2023' },
-        { name: 'Invoice_Archive_2022.zip', size: '154.2 MB', type: 'Archive', status: 'FAILED', user: 'Mark K.', date: 'Oct 22, 2023' },
-        { name: 'Blueprint_Modern_Villa.dwg', size: '12.8 MB', type: 'CAD File', status: 'COMPLETED', user: 'David Chen', date: 'Oct 21, 2023' },
-    ];
+const API_BASE = 'http://localhost:8080';
+
+const VersionControl = ({ onNavigate, onLogout }) => {
+    const [documents, setDocuments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [openMenuId, setOpenMenuId] = useState(null);
+    const menuRef = useRef(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        fetch(`${API_BASE}/files`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error(`Failed to load documents (${res.status})`);
+                return res.json();
+            })
+            .then((data) => {
+                setDocuments(data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                setError(err.message);
+                setLoading(false);
+            });
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setOpenMenuId(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const formatDate = (isoStr) => {
+        if (!isoStr) return '—';
+        return new Date(isoStr).toLocaleString('vi-VN', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit',
+        });
+    };
+
+    const formatBytes = (bytes) => {
+        if (!bytes) return '—';
+        const mb = bytes / (1024 * 1024);
+        return mb < 1 ? `${(bytes / 1024).toFixed(1)} KB` : `${mb.toFixed(1)} MB`;
+    };
+
+    const handleToggleMenu = (e, docId) => {
+        e.stopPropagation(); // Ngăn sự kiện click lan ra thẻ <tr>
+        setOpenMenuId((prev) => (prev === docId ? null : docId));
+    };
+
+    const handleView = (e, doc) => {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        onNavigate(`/preview?id=${doc.id}`);
+    };
+
+    const handleUpdate = (e, doc) => {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        onNavigate('/update-document', doc);
+    };
 
     return (
-        <div className="dashboard-container">
-            {/* 1. SIDEBAR */}
-            <aside className="sidebar">
-                <div className="sidebar-brand">
-                    <h2>DocuManage</h2>
+        <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="version-control">
+
+            <div className="content-header">
+                <div className="title-section">
+                    <h1>Document Management System</h1>
                 </div>
-
-                <button className="btn-upload">
-                    <Plus size={20} /> Upload Document
-                </button>
-
-                <nav className="sidebar-nav">
-                    <div className="nav-item active"><FileText size={20}/> Documents</div>
-                    <div className="nav-item"><Share2 size={20}/> Shared</div>
-                    <div className="nav-item"><Clock size={20}/> Recent</div>
-                    <div className="nav-item"><Settings size={20}/> Settings</div>
-                </nav>
-
-                <div className="sidebar-user">
-                    <img src="https://via.placeholder.com/40" alt="avatar" />
-                    <div className="user-info">
-                        <strong>Admin User</strong>
-                        <span>admin@ledgerpro.com</span>
-                    </div>
+                <div className="action-buttons">
+                    <button className="btn-export">Export Report</button>
+                    <button className="btn-filter"><ListFilter size={18} />Filter Documents</button>
                 </div>
-            </aside>
+            </div>
 
-            {/* 2. MAIN AREA */}
-            <main className="main-area">
-                {/* Top Header */}
-                <header className="top-nav">
-                    <div className="search-bar">
-                        <Search size={18} />
-                        <input type="text" placeholder="Search Document..." />
-                    </div>
-                    <div className="top-nav-right">
-                        <Bell size={20} />
-                        <HelpCircle size={20} />
-                        <div className="lang-select">VN <ChevronRight size={14}/></div>
-                    </div>
-                </header>
+            <div className="table-card">
+                <div className="table-header"><h3>Active Files</h3></div>
 
-                {/* Page Title */}
-                <div className="content-header">
-                    <div className="title-section">
-                        <h1>Document Management System</h1>
-
+                {loading && (
+                    <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                        Loading documents...
                     </div>
-                    <div className="action-buttons">
-                        <button className="btn-export">Export Report</button>
-                        <button className="btn-filter"><ListFilter size={18} />Filter Documents</button>
+                )}
+                {error && (
+                    <div style={{ padding: '40px', textAlign: 'center', color: '#ef4444' }}>
+                        {error}
                     </div>
-                </div>
-
-                {/* Table Area */}
-                <div className="table-card">
-                    <div className="table-header">
-                        <h3>Active Files</h3>
+                )}
+                {!loading && !error && documents.length === 0 && (
+                    <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                        No documents uploaded yet.
                     </div>
+                )}
 
+                {!loading && !error && documents.length > 0 && (
                     <table className="doc-table">
                         <thead>
                         <tr>
                             <th>FILENAME</th>
-                            <th>STATUS</th>
-                            <th>CREATED BY</th>
+                            <th>VERSION</th>
+                            <th>UPLOADED BY</th>
                             <th>UPLOAD DATE/TIME</th>
+                            <th>SIZE</th>
                             <th></th>
                         </tr>
                         </thead>
-                        <tbody>
-                        {documents.map((doc, index) => (
-                            <tr key={index}>
+                        <tbody ref={menuRef}>
+                        {documents.map((doc) => (
+                            <tr
+                                key={doc.id}
+                                className="clickable-row"
+                                onClick={() => onNavigate(`${VERSION_DETAIL_ROUTE}?id=${doc.id}`)}
+                            >
                                 <td>
                                     <div className="file-info">
-                                        <div className="file-icon"><FileText size={18}/></div>
+                                        <div className="file-icon"><FileText size={18} /></div>
                                         <div>
-                                            <strong>{doc.name}</strong>
-                                            <p>{doc.size} • {doc.type}</p>
+                                            <strong>{doc.fileName}</strong>
+                                            <p>{doc.fileType?.toUpperCase()}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td><span className={`status-badge ${doc.status.toLowerCase()}`}>{doc.status}</span></td>
-                                <td>{doc.user}</td>
-                                <td>{doc.date}</td>
-                                <td><Eye size={18} className="icon-view"/></td>
+                                <td>
+                                    <span className="status-badge completed">{doc.version}</span>
+                                </td>
+                                <td>{doc.uploadedBy}</td>
+                                <td>{formatDate(doc.uploadedAt)}</td>
+                                <td>{formatBytes(doc.fileSize)}</td>
+                                <td className="action-cell">
+                                    <div className="row-menu-wrapper">
+                                        <button
+                                            className="btn-more"
+                                            title="Actions"
+                                            onClick={(e) => handleToggleMenu(e, doc.id)}
+                                        >
+                                            <MoreHorizontal size={18} />
+                                        </button>
+                                        {openMenuId === doc.id && (
+                                            <div className="row-dropdown">
+                                                <button onClick={(e) => handleView(e, doc)}>
+                                                    View
+                                                </button>
+                                                <button onClick={(e) => handleUpdate(e, doc)}>
+                                                    Update
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                         </tbody>
                     </table>
-                </div>
-            </main>
-        </div>
+                )}
+            </div>
+        </DashboardLayout>
     );
 };
 

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import LoginPage from './page/LoginPage';
+import SignUpPage from './page/SignUpPage';
 import UploadDashboard from './page/UploadDashboard';
 import VersionControl from './page/VersionControl';
 import VersionDetail from './page/Version-Detail';
 import DocumentPreview from './page/DocumentPreview';
 
 const LOGIN_ROUTE = '/login';
+const SIGNUP_ROUTE = '/signup';
 const DASHBOARD_ROUTE = '/upload';
 const VERSION_CONTROL_ROUTE = '/version-control';
 const VERSION_DETAIL_ROUTE = '/version-detail';
@@ -13,6 +15,7 @@ const PREVIEW_ROUTE = '/preview';
 
 const resolveRoute = (pathname) => {
   if (
+    pathname === SIGNUP_ROUTE ||
     pathname === DASHBOARD_ROUTE ||
     pathname === VERSION_CONTROL_ROUTE ||
     pathname === VERSION_DETAIL_ROUTE ||
@@ -49,6 +52,10 @@ function App() {
     setCurrentRoute(pathname);
   };
 
+  if (currentRoute === SIGNUP_ROUTE) {
+    return <SignUpPage onNavigate={() => navigateTo(LOGIN_ROUTE)} />;
+  }
+
   if (currentRoute === DASHBOARD_ROUTE) {
     return <UploadDashboard onLogout={() => navigateTo(LOGIN_ROUTE)} onNavigate={navigateTo} />;
   }
@@ -65,7 +72,7 @@ function App() {
     return <DocumentPreview onNavigate={navigateTo} />;
   }
 
-  return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} />;
+  return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)} />;
 
 }
 

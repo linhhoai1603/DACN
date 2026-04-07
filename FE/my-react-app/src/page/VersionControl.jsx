@@ -11,6 +11,7 @@ const VersionControl = ({ onNavigate, onLogout }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [openMenuId, setOpenMenuId] = useState(null);
+    const [sortOrder, setSortOrder] = useState('desc'); // 'desc' = mới nhất trước
     const menuRef = useRef(null);
 
     useEffect(() => {
@@ -55,6 +56,14 @@ const VersionControl = ({ onNavigate, onLogout }) => {
         const mb = bytes / (1024 * 1024);
         return mb < 1 ? `${(bytes / 1024).toFixed(1)} KB` : `${mb.toFixed(1)} MB`;
     };
+
+    const sortedDocuments = [...documents].sort((a, b) => {
+        const dateA = new Date(a.uploadedAt || 0);
+        const dateB = new Date(b.uploadedAt || 0);
+        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+    });
+
+    const toggleSort = () => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
 
     const handleToggleMenu = (e, docId) => {
         e.stopPropagation(); // Ngăn sự kiện click lan ra thẻ <tr>
@@ -107,19 +116,22 @@ const VersionControl = ({ onNavigate, onLogout }) => {
                 )}
 
                 {!loading && !error && documents.length > 0 && (
+                    <div className="table-scroll-wrapper">
                     <table className="doc-table">
                         <thead>
                         <tr>
                             <th>FILENAME</th>
                             <th>VERSION</th>
                             <th>UPLOADED BY</th>
-                            <th>UPLOAD DATE/TIME</th>
+                            <th onClick={toggleSort} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                                UPLOAD DATE/TIME {sortOrder === 'desc' ? '↓' : '↑'}
+                            </th>
                             <th>SIZE</th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody ref={menuRef}>
-                        {documents.map((doc) => (
+                        {sortedDocuments.map((doc) => (
                             <tr
                                 key={doc.id}
                                 className="clickable-row"
@@ -165,6 +177,7 @@ const VersionControl = ({ onNavigate, onLogout }) => {
                         ))}
                         </tbody>
                     </table>
+                    </div>
                 )}
             </div>
         </DashboardLayout>

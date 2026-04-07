@@ -4,10 +4,11 @@ import {
     Upload, ChevronLeft, Info, CheckCircle
 } from 'lucide-react';
 import './UpdateDocument.css';
+import DashboardLayout from "../component/DashboardLayout";
 
 const API_BASE = 'http://localhost:8080';
 
-const UpdateDocument = ({ onNavigate, doc }) => {
+const UpdateDocument = ({ onNavigate, doc, onLogout }) => {
     const fileInputRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -105,32 +106,10 @@ const UpdateDocument = ({ onNavigate, doc }) => {
     const infoUploader = doc?.uploadedBy || '—';
 
     return (
+        <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="dashboard">
         <div className="dashboard-container">
             {/* Sidebar */}
-            <aside className="sidebar">
-                <div className="sidebar-brand"><h2>DocuManage</h2></div>
 
-                <button className="btn-upload" onClick={() => onNavigate('/upload')}>
-                    <Plus size={20} /> Upload Document
-                </button>
-
-                <nav className="sidebar-nav">
-                    <div className="nav-item" onClick={() => onNavigate('/version-control')}>
-                        <FileText size={20} /> Documents
-                    </div>
-                    <div className="nav-item"><Share2 size={20} /> Shared</div>
-                    <div className="nav-item"><Clock size={20} /> Recent</div>
-                    <div className="nav-item active"><Settings size={20} /> Update Version</div>
-                </nav>
-
-                <div className="sidebar-user">
-                    <img src="https://via.placeholder.com/40" alt="avatar" />
-                    <div className="user-info">
-                        <strong>Admin User</strong>
-                        <span>admin@ledgerpro.com</span>
-                    </div>
-                </div>
-            </aside>
 
             <main className="ud-main">
                 {/* Breadcrumb */}
@@ -282,6 +261,7 @@ const UpdateDocument = ({ onNavigate, doc }) => {
                 </div>
             </main>
         </div>
+        </DashboardLayout>
     );
 };
 

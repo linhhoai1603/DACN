@@ -3,6 +3,10 @@ import LoginPage from './page/LoginPage';
 import SignUpPage from './page/SignUpPage';
 import UploadDashboard from './page/UploadDashboard';
 import VersionControl from './page/VersionControl';
+// import VersionDetail from './page/Version-Detail';
+// import DocumentPreview from './page/DocumentPreview';
+// import UpdateDocument from './page/UpdateDocument';
+import DashboardPage from "./page/DashboardPage";
 import VersionDetail from './page/Version-Detail';
 import DocumentPreview from './page/DocumentPreview';
 import UpdateDocument from './page/UpdateDocument';
@@ -14,6 +18,7 @@ const VERSION_CONTROL_ROUTE = '/version-control';
 export const VERSION_DETAIL_ROUTE = '/version-detail';
 const PREVIEW_ROUTE = '/preview';
 const UPDATE_DOCUMENT_ROUTE = '/update-document';
+const DASHBOARD = '/dashboard';
 
 const resolveRoute = (pathname) => {
   if (
@@ -22,11 +27,13 @@ const resolveRoute = (pathname) => {
     pathname === VERSION_CONTROL_ROUTE ||
     pathname === VERSION_DETAIL_ROUTE ||
     pathname === PREVIEW_ROUTE ||
-    pathname === UPDATE_DOCUMENT_ROUTE
+    pathname === UPDATE_DOCUMENT_ROUTE ||
+    pathname === DASHBOARD
   ) {
     return pathname;
   }
   return LOGIN_ROUTE;
+
 };
 
 function App() {
@@ -71,6 +78,9 @@ function App() {
   }
   if (currentRoute === UPDATE_DOCUMENT_ROUTE) {
     return <UpdateDocument onNavigate={navigateTo} doc={selectedDoc} />;
+  }
+  if (currentRoute === DASHBOARD) {
+    return <DashboardPage onNavigate={navigateTo} />;
   }
 
   return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)} />;

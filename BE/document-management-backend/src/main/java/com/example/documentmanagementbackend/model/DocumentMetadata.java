@@ -50,7 +50,7 @@ public class DocumentMetadata {
     private String version;
 
     // Thời điểm tạo lần đầu (không thay đổi khi update)
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     // FK trỏ tới bản ghi version hiện tại trong document_versions

@@ -1,18 +1,80 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Filter, Download, MoreVertical, RefreshCw, Trash2, FolderArchive, FileText } from 'lucide-react';
 import DashboardLayout  from "../component/DashboardLayout";
+import { DocumentModel } from "../model/DocumentModel";
 import './DashboardPage.css';
 
-const documentData = [
-    { id: 1, name: 'q3_financial_report.pdf', size: '2.4 MB', type: 'PDF', commit: 'Update revenue projections', uploader: 'David Miller', date: 'Oct 24, 2023', time: '14:32', color: '#4f46e5' },
-    { id: 2, name: 'branding_guidelines_v2.doc', size: '15.8 MB', type: 'DOCX', commit: 'Revised typography section', uploader: 'Sarah Jenkins', date: 'Oct 23, 2023', time: '09:15', color: '#7c3aed' },
-    { id: 3, name: 'user_analytics_raw.csv', size: '1.2 GB', type: 'CSV', commit: 'Initial data dump for October', uploader: 'Mike Kulas', date: 'Oct 22, 2023', time: '18:45', color: '#ea580c' },
-    { id: 4, name: 'Legal_Contracts_Archive', size: '42 items', type: 'ZIP', commit: 'End of year legal consolidation', uploader: 'Elena Rodriguez', date: 'Oct 20, 2023', time: '11:02', color: '#16a34a' },
-];
+const formatBytes = (bytes, decimals = 1) => {
+    if (!+bytes) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+};
+
+const formatDate = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
+
+const formatTime = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+};
+
+const getFileColor = (type) => {
+    if (!type) return '#64748b';
+    const t = type.toLowerCase();
+    if (t.includes('pdf')) return '#4f46e5';
+    if (t.includes('doc')) return '#7c3aed';
+    if (t.includes('csv') || t.includes('xls')) return '#ea580c';
+    if (t.includes('zip') || t.includes('rar')) return '#16a34a';
+    return '#64748b'; // default
+};
 
 function DashboardPage({ onNavigate, onLogout }) {
+    const [documents, setDocuments] = useState([]);
     const [openMenuId, setOpenMenuId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const [inputPage, setInputPage] = useState(1);
     const menuRef = useRef(null);
+
+    // Sync inputPage when currentPage changes via buttons
+    useEffect(() => {
+        setInputPage(currentPage + 1);
+    }, [currentPage]);
+
+    // Fetch total document count to calculate total pages
+    useEffect(() => {
+        fetch('http://localhost:8080/files/count')
+            .then(res => res.json())
+            .then(data => {
+                // Handle different response formats (number, string, or object like { count: 35 })
+                const totalCount = typeof data === 'number' ? data : (data.count || parseInt(data, 10));
+                const calculatedPages = Math.ceil(totalCount / 10);
+                setTotalPages(calculatedPages > 0 ? calculatedPages : 1);
+            })
+            .catch(err => console.error('Error fetching document count:', err));
+    }, []);
+
+    useEffect(() => {
+        // Fetch files from API based on currentPage
+        fetch(`http://localhost:8080/files?page=${currentPage}&index=10`)
+            .then(res => res.json())
+            .then(data => {
+                // Extract array from paginated response or direct array
+                const items = Array.isArray(data) ? data : (data.content || []);
+                
+                // Trích xuất thành plain object thông qua constructor của Model
+                const mappedDocuments = items.map(item => ({...new DocumentModel(item)}));
+                setDocuments(mappedDocuments);
+            })
+            .catch(err => console.error('Error fetching documents:', err));
+    }, [currentPage]);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -26,6 +88,23 @@ function DashboardPage({ onNavigate, onLogout }) {
 
     const toggleMenu = (id) => {
         setOpenMenuId(openMenuId === id ? null : id);
+    };
+
+    const handlePageInputSubmit = () => {
+        let pageNum = parseInt(inputPage, 10);
+        if (isNaN(pageNum) || pageNum < 1) {
+            pageNum = 1;
+        } else if (pageNum > totalPages) {
+            pageNum = totalPages;
+        }
+        setCurrentPage(pageNum - 1);
+        setInputPage(pageNum); // Reset valid format back
+    };
+
+    const handlePageInputKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handlePageInputSubmit();
+        }
     };
 
     return (
@@ -58,34 +137,38 @@ function DashboardPage({ onNavigate, onLogout }) {
                         </tr>
                         </thead>
                         <tbody>
-                        {documentData.map((file) => (
+                        {documents.map((file) => (
                             <tr key={file.id}>
                                 <td className="file-cell">
                                     <div className="file-type-icon"
-                                         style={{backgroundColor: `${file.color}20`, color: file.color}}>
-                                        {file.type === 'ZIP' ? <FolderArchive size={20} /> : <FileText size={20} />}
+                                         style={{backgroundColor: `${getFileColor(file.fileType)}20`, color: getFileColor(file.fileType)}}>
+                                        {file.fileType?.toUpperCase() === 'ZIP' ? <FolderArchive size={20} /> : <FileText size={20} />}
                                     </div>
                                     <div>
-                                        <div className="file-name-text">{file.name}</div>
-                                        <div className="file-sub-text">{file.size} • {file.type}</div>
+                                        <div className="file-name-text">
+                                            <a href={file.url} target="_blank" rel="noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>
+                                                {file.fileName}
+                                            </a>
+                                        </div>
+                                        <div className="file-sub-text">{formatBytes(file.fileSize)} • {file.fileType ? file.fileType.toUpperCase() : 'FILE'}</div>
                                     </div>
                                 </td>
                                 <td>
                                     <div className="commit-info">
                                         <span className="dot-status"></span>
-                                        {file.commit}
+                                        {file.commitMessage}
                                     </div>
                                 </td>
                                 <td>
                                     <div className="uploader-info">
-                                        <div className="mini-avatar">{file.uploader.charAt(0)}</div>
-                                        {file.uploader}
+                                        <div className="mini-avatar">{file.uploadedBy ? file.uploadedBy.charAt(0).toUpperCase() : '?'}</div>
+                                        {file.uploadedBy}
                                     </div>
                                 </td>
                                 <td>
                                     <div className="time-info">
-                                        <strong>{file.date}</strong>
-                                        <span>• {file.time}</span>
+                                        <strong>{formatDate(file.uploadedAt)}</strong>
+                                        <span>• {formatTime(file.uploadedAt)}</span>
                                     </div>
                                 </td>
                                 <td className="actions-cell">
@@ -113,6 +196,51 @@ function DashboardPage({ onNavigate, onLogout }) {
                         ))}
                         </tbody>
                     </table>
+                </div>
+
+                <div className="pagination-wrapper">
+                    <button 
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))} 
+                        disabled={currentPage === 0}
+                    >
+                        &lt;
+                    </button>
+                    <div className="pagination-divider"></div>
+                    <span className="pagination-current">{currentPage + 1}</span>
+                    <div className="pagination-divider"></div>
+                    <button 
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(prev => prev + 1)} 
+                        disabled={currentPage >= totalPages - 1}
+                    >
+                        &gt;
+                    </button>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', marginLeft: '20px', gap: '8px' }}>
+                        <label htmlFor="pageInput" style={{ fontSize: '14px', color: '#64748b' }}>Page:</label>
+                        <input 
+                            id="pageInput"
+                            type="number"
+                            min="1"
+                            step="1"
+                            style={{ width: '60px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center' }}
+                            value={inputPage}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === '' || /^[1-9]\d*$/.test(val)) {
+                                    setInputPage(val);
+                                }
+                            }}
+                            onKeyDown={handlePageInputKeyDown}
+                        />
+                        <button 
+                            style={{ padding: '4px 12px', borderRadius: '4px', border: 'none', backgroundColor: '#3b82f6', color: 'white', cursor: 'pointer' }}
+                            onClick={handlePageInputSubmit}
+                        >
+                            Go
+                        </button>
+                    </div>
                 </div>
             </section>
         </DashboardLayout>

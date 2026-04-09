@@ -52,7 +52,7 @@ class BugConditionExplorationTest {
         user.setPhone(PHONE);
         user.setPassword(passwordEncoder.encode(RAW_PASSWORD));
         user.setFullName("Test User");
-        user.setRole(Role.USER);
+        user.setRole(Role.USERS);
 
         when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));

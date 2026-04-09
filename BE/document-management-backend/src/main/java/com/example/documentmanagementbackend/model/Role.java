@@ -1,7 +1,7 @@
 package com.example.documentmanagementbackend.model;
 
 public enum Role {
-    USER,
+    USERS,
     ADMIN,
-    MANAGER
+    DIRECTOR
 }

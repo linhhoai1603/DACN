@@ -56,4 +56,5 @@ public class DocumentMetadata {
     // FK trỏ tới bản ghi version hiện tại trong document_versions
     @Column(name = "current_version_id")
     private Long currentVersionId;
+
 }

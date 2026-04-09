@@ -1,44 +1,40 @@
-package com.example.documentmanagementbackend.service;
+package com.example.documentmanagementbackend.service.impl;
 
+import com.example.documentmanagementbackend.dto.response.DocumentMetadataNativeResponse;
 import com.example.documentmanagementbackend.dto.response.DocumentMetadataResponse;
-import com.example.documentmanagementbackend.model.DocumentMetadata;
 import com.example.documentmanagementbackend.repository.DocumentMetadataRepository;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import com.example.documentmanagementbackend.service.DocumentService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
-public class DocumentPreviewService  {
+@AllArgsConstructor
+public class DocumentServiceImpl implements DocumentService {
 
     private static final Set<String> OFFICE_TYPES = Set.of("doc", "docx", "xls", "xlsx");
     private static final String GOOGLE_VIEWER = "https://docs.google.com/viewer?embedded=true&url=";
 
     private final DocumentMetadataRepository metadataRepository;
 
-    public DocumentPreviewService(DocumentMetadataRepository metadataRepository) {
-        this.metadataRepository = metadataRepository;
-    }
-
-    public DocumentMetadataResponse getById(Long id) {
-        DocumentMetadata doc = metadataRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Document not found with id: " + id));
-        return toResponse(doc);
-    }
-
-    public List<DocumentMetadataResponse> getAll() {
-        return metadataRepository.findAll()
+    @Override
+    public List<DocumentMetadataResponse> getDocuments(int index, int page) {
+        return metadataRepository.findLatestDocumentMetadata(page, index)
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    private DocumentMetadataResponse toResponse(DocumentMetadata doc) {
-        String ext = getExtension(doc.getFileName());
-        String previewUrl = buildPreviewUrl(ext, doc.getUrl(), doc.getId());
+    @Override
+    public long countDocuments() {
+        return metadataRepository.count();
+    }
+
+    private DocumentMetadataResponse toResponse(DocumentMetadataNativeResponse doc) {
+        String fileType = getExtension(doc.getFileName());
+        String previewUrl = buildPreviewUrl(fileType, doc.getId());
         return new DocumentMetadataResponse(
                 doc.getId(),
                 doc.getFileName(),
@@ -49,21 +45,17 @@ public class DocumentPreviewService  {
                 doc.getUploadedAt(),
                 doc.getCommitMessage(),
                 doc.getVersion(),
-                ext,
+                fileType,
                 previewUrl
         );
     }
 
-    private String buildPreviewUrl(String ext, String fileUrl, Long id) {
-        // Dùng backend proxy /stream để đảm bảo đúng Content-Type
-        // PDF: inline trong browser qua proxy
-        // Office files: Google Docs Viewer trỏ đến proxy URL
+    private String buildPreviewUrl(String fileType, Long id) {
         String streamUrl = "http://localhost:8080/files/" + id + "/stream";
-
-        if ("pdf".equals(ext)) {
+        if ("pdf".equals(fileType)) {
             return streamUrl;
         }
-        if (OFFICE_TYPES.contains(ext)) {
+        if (OFFICE_TYPES.contains(fileType)) {
             return GOOGLE_VIEWER + encodeUrl(streamUrl);
         }
         return streamUrl;
@@ -78,7 +70,9 @@ public class DocumentPreviewService  {
     }
 
     private String getExtension(String filename) {
-        if (filename == null || !filename.contains(".")) return "";
+        if (filename == null || !filename.contains(".")) {
+            return "";
+        }
         return filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
     }
 }

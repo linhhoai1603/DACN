@@ -207,14 +207,7 @@ function DashboardPage({ onNavigate, onLogout }) {
                         &lt;
                     </button>
                     <div className="pagination-divider"></div>
-                    <input 
-                        type="text"
-                        className="pagination-input"
-                        value={inputPage}
-                        onChange={(e) => setInputPage(e.target.value)}
-                        onBlur={handlePageInputSubmit}
-                        onKeyDown={handlePageInputKeyDown}
-                    />
+                    <span className="pagination-current">{currentPage + 1}</span>
                     <div className="pagination-divider"></div>
                     <button 
                         className="pagination-btn"
@@ -223,6 +216,31 @@ function DashboardPage({ onNavigate, onLogout }) {
                     >
                         &gt;
                     </button>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', marginLeft: '20px', gap: '8px' }}>
+                        <label htmlFor="pageInput" style={{ fontSize: '14px', color: '#64748b' }}>Page:</label>
+                        <input 
+                            id="pageInput"
+                            type="number"
+                            min="1"
+                            step="1"
+                            style={{ width: '60px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center' }}
+                            value={inputPage}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === '' || /^[1-9]\d*$/.test(val)) {
+                                    setInputPage(val);
+                                }
+                            }}
+                            onKeyDown={handlePageInputKeyDown}
+                        />
+                        <button 
+                            style={{ padding: '4px 12px', borderRadius: '4px', border: 'none', backgroundColor: '#3b82f6', color: 'white', cursor: 'pointer' }}
+                            onClick={handlePageInputSubmit}
+                        >
+                            Go
+                        </button>
+                    </div>
                 </div>
             </section>
         </DashboardLayout>

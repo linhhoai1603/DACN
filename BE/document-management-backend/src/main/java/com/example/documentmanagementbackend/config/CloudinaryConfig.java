@@ -19,7 +19,7 @@ public class CloudinaryConfig {
         String apiSecret = dotenv.get("CLOUDINARY_API_SECRET");
 
         if (cloudName == null || apiKey == null || apiSecret == null) {
-            throw new RuntimeException("Cloudinary env missing!");
+            throw new RuntimeException("Cloudinary .env missing!");
         }
 
         return new Cloudinary(ObjectUtils.asMap(

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { FileText, ListFilter, MoreHorizontal } from 'lucide-react';
 import './VersionControl.css';
 import DashboardLayout from "../component/DashboardLayout";
-import { VERSION_DETAIL_ROUTE } from '../App.js';
 
 const API_BASE = 'http://localhost:8080';
 
@@ -73,7 +72,7 @@ const VersionControl = ({ onNavigate, onLogout }) => {
     const handleView = (e, doc) => {
         e.stopPropagation();
         setOpenMenuId(null);
-        onNavigate(`/preview?id=${doc.id}`);
+        window.open(doc.url, '_blank', 'noreferrer');
     };
 
     const handleUpdate = (e, doc) => {
@@ -135,7 +134,7 @@ const VersionControl = ({ onNavigate, onLogout }) => {
                             <tr
                                 key={doc.id}
                                 className="clickable-row"
-                                onClick={() => onNavigate(`${VERSION_DETAIL_ROUTE}?id=${doc.id}`)}
+                                onClick={() => window.open(doc.url, '_blank', 'noreferrer')}
                             >
                                 <td>
                                     <div className="file-info">

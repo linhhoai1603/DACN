@@ -1,10 +1,11 @@
+import config from '../config/api';
 import { useEffect, useRef, useState } from 'react';
 import { FileText, ListFilter, MoreHorizontal } from 'lucide-react';
 import './VersionControl.css';
 import DashboardLayout from "../component/DashboardLayout";
 import { VERSION_DETAIL_ROUTE } from '../App.js';
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = config.API_BASE_URL;
 
 const VersionControl = ({ onNavigate, onLogout }) => {
     const [documents, setDocuments] = useState([]);

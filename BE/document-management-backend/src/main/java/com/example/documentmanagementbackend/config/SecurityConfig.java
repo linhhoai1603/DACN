@@ -53,7 +53,7 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000, https://dacn-alpha.vercel.app")); // không dùng "*"
+        config.setAllowedOrigins(List.of("http://localhost:3000", "https://dacn-alpha.vercel.app")); // không dùng "*"
         config.setAllowCredentials(true);
         config.setAllowedMethods(List.of("GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"));
         config.setAllowedHeaders(List.of("Content-Type", "Authorization"));

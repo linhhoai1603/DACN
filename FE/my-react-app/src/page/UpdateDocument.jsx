@@ -1,3 +1,4 @@
+import config from '../config/api';
 import { useRef, useState } from 'react';
 import {
     FileText, Share2, Clock, Settings, Plus,
@@ -6,7 +7,7 @@ import {
 import './UpdateDocument.css';
 import DashboardLayout from "../component/DashboardLayout";
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = config.API_BASE_URL;
 
 const UpdateDocument = ({ onNavigate, doc, onLogout }) => {
     const fileInputRef = useRef(null);

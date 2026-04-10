@@ -1,3 +1,4 @@
+import config from '../config/api';
 import { useEffect, useRef, useState } from 'react';
 import { FileText, ListFilter, MoreHorizontal, X } from 'lucide-react';
 import './VersionControl.css';
@@ -5,7 +6,7 @@ import DashboardLayout from "../component/DashboardLayout";
 import FilePreview from "../component/FilePreview";
 import "../component/FilePreview.css";
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = config.API_BASE_URL;
 
 const VersionControl = ({ onNavigate, onLogout }) => {
     const [documents, setDocuments] = useState([]);
@@ -85,7 +86,6 @@ const VersionControl = ({ onNavigate, onLogout }) => {
     };
 
     return (
-        <>
         <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="version-control">
             <div className="content-header">
                 <div className="title-section">
@@ -138,7 +138,7 @@ const VersionControl = ({ onNavigate, onLogout }) => {
                             <tr
                                 key={doc.id}
                                 className="clickable-row"
-                                onClick={() => window.open(doc.url, '_blank', 'noreferrer')}
+                                onClick={() => onNavigate(`${VERSION_DETAIL_ROUTE}?id=${doc.id}&file=${encodeURIComponent(doc.fileName)}`)}
                             >
                                 <td>
                                     <div className="file-info">

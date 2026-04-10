@@ -1,8 +1,9 @@
+import config from '../config/api';
 import { useMemo, useRef, useState } from 'react';
 import './UploadDashboard.css';
 import DashboardLayout from "../component/DashboardLayout";
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = config.API_BASE_URL;
 
 function UploadDashboard({ onLogout, onNavigate }) {
     const fileInputRef = useRef(null);

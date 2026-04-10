@@ -1,8 +1,9 @@
+import config from '../config/api';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { ChevronLeft, Download, RotateCcw, Maximize2 } from 'lucide-react';
 import './DocumentPreview.css';
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = config.API_BASE_URL;
 const ZOOM_STEP = 0.15;
 const ZOOM_MIN = 0.4;
 const ZOOM_MAX = 3.0;

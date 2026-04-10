@@ -1,9 +1,13 @@
 import config from '../config/api';
 import React, { useState, useEffect, useRef } from 'react';
-import { Filter, Download, MoreVertical, RefreshCw, Trash2, FolderArchive, FileText } from 'lucide-react';
+import { Filter, Download, MoreVertical, RefreshCw, Trash2, FolderArchive, FileText, X } from 'lucide-react';
 import DashboardLayout  from "../component/DashboardLayout";
 import { DocumentModel } from "../model/DocumentModel";
+import FilePreview from "../component/FilePreview";
+import "../component/FilePreview.css";
 import './DashboardPage.css';
+
+const API_BASE = 'http://localhost:8080';
 
 const formatBytes = (bytes, decimals = 1) => {
     if (!+bytes) return '0 Bytes';
@@ -42,6 +46,7 @@ function DashboardPage({ onNavigate, onLogout }) {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [inputPage, setInputPage] = useState(1);
+    const [previewDoc, setPreviewDoc] = useState(null);
     const menuRef = useRef(null);
 
     // Sync inputPage when currentPage changes via buttons
@@ -87,8 +92,21 @@ function DashboardPage({ onNavigate, onLogout }) {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const toggleMenu = (id) => {
+    const toggleMenu = (e, id) => {
+        e.stopPropagation();
         setOpenMenuId(openMenuId === id ? null : id);
+    };
+
+    const handleView = (e, doc) => {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        setPreviewDoc(doc);
+    };
+
+    const handleUpdate = (e, doc) => {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        onNavigate('/update-document', doc);
     };
 
     const handlePageInputSubmit = () => {
@@ -109,6 +127,7 @@ function DashboardPage({ onNavigate, onLogout }) {
     };
 
     return (
+        <>
         <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="dashboard">
             <section className="content">
                 <div className="content-header-row">
@@ -139,18 +158,14 @@ function DashboardPage({ onNavigate, onLogout }) {
                         </thead>
                         <tbody>
                         {documents.map((file) => (
-                            <tr key={file.id}>
+                            <tr key={file.id} className="clickable-row" onClick={() => setPreviewDoc(file)}>
                                 <td className="file-cell">
                                     <div className="file-type-icon"
                                          style={{backgroundColor: `${getFileColor(file.fileType)}20`, color: getFileColor(file.fileType)}}>
                                         {file.fileType?.toUpperCase() === 'ZIP' ? <FolderArchive size={20} /> : <FileText size={20} />}
                                     </div>
                                     <div>
-                                        <div className="file-name-text">
-                                            <a href={file.url} target="_blank" rel="noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>
-                                                {file.fileName}
-                                            </a>
-                                        </div>
+                                        <div className="file-name-text">{file.fileName}</div>
                                         <div className="file-sub-text">{formatBytes(file.fileSize)} • {file.fileType ? file.fileType.toUpperCase() : 'FILE'}</div>
                                     </div>
                                 </td>
@@ -176,17 +191,20 @@ function DashboardPage({ onNavigate, onLogout }) {
                                     <div className="action-menu-container" ref={openMenuId === file.id ? menuRef : null}>
                                         <button
                                             className="action-dot-btn"
-                                            onClick={() => toggleMenu(file.id)}
+                                            onClick={(e) => toggleMenu(e, file.id)}
                                         >
                                             <MoreVertical size={20} />
                                         </button>
 
                                         {openMenuId === file.id && (
                                             <div className="dropdown-menu">
-                                                <button className="menu-option">
+                                                <button className="menu-option" onClick={(e) => handleView(e, file)}>
+                                                    <FileText size={14} /> View
+                                                </button>
+                                                <button className="menu-option" onClick={(e) => handleUpdate(e, file)}>
                                                     <RefreshCw size={14} /> Update
                                                 </button>
-                                                <button className="menu-option delete">
+                                                <button className="menu-option delete" onClick={(e) => e.stopPropagation()}>
                                                     <Trash2 size={14} /> Delete
                                                 </button>
                                             </div>
@@ -245,6 +263,32 @@ function DashboardPage({ onNavigate, onLogout }) {
                 </div>
             </section>
         </DashboardLayout>
+
+        {previewDoc && (
+            <div className="preview-overlay" onClick={() => setPreviewDoc(null)}>
+                <div className="preview-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="preview-modal-header">
+                        <span className="preview-modal-title">{previewDoc.fileName}</span>
+                        <div className="preview-modal-actions">
+                            <a
+                                href={`${API_BASE}/files/${previewDoc.id}/download`}
+                                download={previewDoc.fileName}
+                                className="btn-download-modal"
+                            >
+                                Download
+                            </a>
+                            <button className="btn-close-modal" onClick={() => setPreviewDoc(null)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="preview-modal-body">
+                        <FilePreview doc={previewDoc} />
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 }
 

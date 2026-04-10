@@ -144,6 +144,8 @@ const UpdateDocument = ({ onNavigate, doc, onLogout }) => {
                             onDrop={handleDrop}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
+                            onClick={() => fileInputRef.current?.click()}
+                            style={{ cursor: 'pointer' }}
                         >
                             <input
                                 ref={fileInputRef}
@@ -170,9 +172,9 @@ const UpdateDocument = ({ onNavigate, doc, onLogout }) => {
                             )}
                         </div>
 
-                        <button className="ud-browse-btn" type="button" onClick={handleBrowse}>
-                            <Upload size={16} /> Choose File
-                        </button>
+                        {/*<button className="ud-browse-btn" type="button" onClick={handleBrowse}>*/}
+                        {/*    <Upload size={16} /> Choose File*/}
+                        {/*</button>*/}
 
                         {/* Summary */}
                         <div className="ud-summary-section">

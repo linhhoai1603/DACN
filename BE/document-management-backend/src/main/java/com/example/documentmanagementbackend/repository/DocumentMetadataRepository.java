@@ -41,4 +41,24 @@ public interface DocumentMetadataRepository extends JpaRepository<DocumentMetada
         int offset = normalizedPageIndex * normalizedPageSize;
         return findLatestDocumentMetadataByLimitOffset(normalizedPageSize, offset);
     }
+
+    @Query(value = """
+            SELECT
+                dm.id AS id,
+                dm.file_name AS fileName,
+                dm.public_id AS publicId,
+                dm.url AS url,
+                dm.file_size AS fileSize,
+                dm.uploaded_by AS uploadedBy,
+                dm.uploaded_at AS uploadedAt,
+                dm.commit_message AS commitMessage,
+                dm.version AS version
+            FROM document_metadata dm
+            INNER JOIN document_versions dv ON dm.current_version_id = dv.id
+            WHERE dv.is_latest = true
+              AND LOWER(dm.file_name) LIKE CONCAT('%', LOWER(:keyword), '%')
+            ORDER BY dv.uploaded_at DESC
+            LIMIT 10
+            """, nativeQuery = true)
+    List<DocumentMetadataNativeResponse> searchLatestDocumentMetadataByKeyword(@Param("keyword") String keyword);
 }

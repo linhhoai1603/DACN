@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Search,
     Bell,
@@ -12,8 +12,43 @@ import {
     Hexagon,
 } from 'lucide-react';
 import './DashboardLayout.css';
+import config from '../config/api';
+import { DocumentModel } from '../model/DocumentModel';
 
-function DashboardLayout({ children, onNavigate, onLogout, activeTab }) {
+function DashboardLayout({ children, onNavigate, onLogout, activeTab, onSearchResults }) {
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+
+    // Gọi API khi người dùng kích hoạt tìm kiếm
+    const handleSearch = async () => {
+        if (!searchKeyword.trim()) {
+            setSearchResults([]);
+            if (onSearchResults) onSearchResults(null);
+            return;
+        }
+        
+        setIsSearching(true);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${config.API_BASE_URL}/files/search?keyword=${encodeURIComponent(searchKeyword)}`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                const rawList = Array.isArray(data) ? data : (data.content || []);
+                const mapped = DocumentModel.fromApiResponseList(rawList);
+                setSearchResults(mapped);
+                if (onSearchResults) onSearchResults(mapped);
+            }
+        } catch (error) {
+            console.error("Search API error:", error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
     return (
         <div className="dashboard-root">
             {/* --- SIDEBAR CHUNG --- */}
@@ -68,10 +103,32 @@ function DashboardLayout({ children, onNavigate, onLogout, activeTab }) {
                     </div>
 
                     <div className="top-actions">
-                        <div className="search-box">
-                            <Search size={16} color="#64748b" />
-                            <input type="text" placeholder="Search files..." />
+                        <div className="search-container">
+                            <div className="search-box">
+                                <Search 
+                                    size={16} 
+                                    color="#64748b" 
+                                    style={{ cursor: 'pointer' }} 
+                                    onClick={handleSearch} 
+                                />
+                                <input 
+                                    type="text" 
+                                    placeholder="Search files..." 
+                                    value={searchKeyword}
+                                    onChange={(e) => {
+                                        setSearchKeyword(e.target.value);
+                                        if (!e.target.value.trim()) {
+                                            setSearchResults([]);
+                                            if (onSearchResults) onSearchResults(null);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleSearch();
+                                    }}
+                                />
+                            </div>
                         </div>
+
                         <button type="button" className="icon-btn"><Bell size={20} color="#64748b" /></button>
                         <button type="button" className="icon-btn"><HelpCircle size={20} color="#64748b" /></button>
                         <button type="button" className="upload-btn" onClick={() => onNavigate('/upload')}>+ Upload New</button>

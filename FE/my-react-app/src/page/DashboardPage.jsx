@@ -1,3 +1,4 @@
+import config from '../config/api';
 import React, { useState, useEffect, useRef } from 'react';
 import { Filter, Download, MoreVertical, RefreshCw, Trash2, FolderArchive, FileText } from 'lucide-react';
 import DashboardLayout  from "../component/DashboardLayout";
@@ -50,7 +51,7 @@ function DashboardPage({ onNavigate, onLogout }) {
 
     // Fetch total document count to calculate total pages
     useEffect(() => {
-        fetch('http://localhost:8080/files/count')
+        fetch(`${config.API_BASE_URL}/files/count`)
             .then(res => res.json())
             .then(data => {
                 // Handle different response formats (number, string, or object like { count: 35 })
@@ -63,7 +64,7 @@ function DashboardPage({ onNavigate, onLogout }) {
 
     useEffect(() => {
         // Fetch files from API based on currentPage
-        fetch(`http://localhost:8080/files?page=${currentPage}&index=10`)
+        fetch(`${config.API_BASE_URL}/files?page=${currentPage}&index=10`)
             .then(res => res.json())
             .then(data => {
                 // Extract array from paginated response or direct array

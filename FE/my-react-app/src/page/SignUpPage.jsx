@@ -1,8 +1,9 @@
+import config from '../config/api';
 import React, { useState } from 'react';
 import { Shield, CloudSync, Lock, User, Phone, Eye, EyeOff, Mail, MapPin } from 'lucide-react';
 import './Loginpage.css';
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = config.API_BASE_URL;
 
 const SignUpPage = ({ onNavigate }) => {
     const [form, setForm] = useState({

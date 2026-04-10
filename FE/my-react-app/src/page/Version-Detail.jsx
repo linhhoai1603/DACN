@@ -1,9 +1,10 @@
+import config from '../config/api';
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, Download, Share2, User, AlertCircle, Loader2 } from 'lucide-react';
 import './VersionControl.css';
 import DashboardLayout from "../component/DashboardLayout";
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = config.API_BASE_URL;
 
 const VersionDetail = ({ onNavigate, onLogout }) => {
   const params = new URLSearchParams(window.location.search);

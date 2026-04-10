@@ -61,29 +61,34 @@ function App() {
     setCurrentRoute(pathname);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigateTo(LOGIN_ROUTE);
+  };
+
   if (currentRoute === SIGNUP_ROUTE) {
     return <SignUpPage onNavigate={() => navigateTo(LOGIN_ROUTE)} />;
   }
   if (currentRoute === DASHBOARD_ROUTE) {
-    return <UploadDashboard onLogout={() => navigateTo(LOGIN_ROUTE)} onNavigate={navigateTo} />;
+    return <UploadDashboard onLogout={handleLogout} onNavigate={navigateTo} />;
   }
   if (currentRoute === VERSION_CONTROL_ROUTE) {
-    return <VersionControl onNavigate={navigateTo} />;
+    return <VersionControl onNavigate={navigateTo} onLogout={handleLogout} />;
   }
   if (currentRoute === VERSION_DETAIL_ROUTE) {
-    return <VersionDetail onNavigate={navigateTo} />;
+    return <VersionDetail onNavigate={navigateTo} onLogout={handleLogout} />;
   }
   if (currentRoute === PREVIEW_ROUTE) {
-    return <DocumentPreview onNavigate={navigateTo} />;
+    return <DocumentPreview onNavigate={navigateTo} onLogout={handleLogout} />;
   }
   if (currentRoute === UPDATE_DOCUMENT_ROUTE) {
-    return <UpdateDocument onNavigate={navigateTo} doc={selectedDoc} />;
+    return <UpdateDocument onNavigate={navigateTo} doc={selectedDoc} onLogout={handleLogout} />;
   }
   if (currentRoute === DASHBOARD) {
-    return <DashboardPage onNavigate={navigateTo} />;
+    return <DashboardPage onNavigate={navigateTo} onLogout={handleLogout} />;
   }
 
-  return <LoginPage onSignIn={() => navigateTo(DASHBOARD_ROUTE)} onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)} />;
+  return <LoginPage onSignIn={() => navigateTo(DASHBOARD)} onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)} />;
 }
 
 export default App;

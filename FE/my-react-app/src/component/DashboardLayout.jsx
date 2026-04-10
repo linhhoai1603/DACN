@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     Search, Bell, HelpCircle, User,
-    Home, File, Users, Star, Trash,
+    File, Users, Star, Trash,
     FileText, Shield, LogOut, Hexagon
 } from 'lucide-react';
 import './DashboardLayout.css';
@@ -29,9 +29,6 @@ function DashboardLayout({ children, onNavigate, onLogout, activeTab }) {
                     </section>
 
                     <nav className="menu">
-                        <button type="button" className={`menu-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => onNavigate('/home')}>
-                            <Home size={18} /> Home
-                        </button>
                         <button type="button" className={`menu-item ${activeTab === 'my-files' ? 'active' : ''}`}>
                             <File size={18} /> My Files
                         </button>

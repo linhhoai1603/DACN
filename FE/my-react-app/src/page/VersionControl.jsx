@@ -135,7 +135,7 @@ const VersionControl = ({ onNavigate, onLogout }) => {
                             <tr
                                 key={doc.id}
                                 className="clickable-row"
-                                onClick={() => onNavigate(`${VERSION_DETAIL_ROUTE}?id=${doc.id}`)}
+                                onClick={() => onNavigate(`${VERSION_DETAIL_ROUTE}?id=${doc.id}&file=${encodeURIComponent(doc.fileName)}`)}
                             >
                                 <td>
                                     <div className="file-info">

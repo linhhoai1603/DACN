@@ -10,6 +10,7 @@ import DashboardPage from "./page/DashboardPage";
 import VersionDetail from './page/Version-Detail';
 import DocumentPreview from './page/DocumentPreview';
 import UpdateDocument from './page/UpdateDocument';
+import FilePreviewPage from './page/FilePreviewPage';
 
 const LOGIN_ROUTE = '/login';
 const SIGNUP_ROUTE = '/signup';
@@ -19,6 +20,17 @@ export const VERSION_DETAIL_ROUTE = '/version-detail';
 const PREVIEW_ROUTE = '/preview';
 const UPDATE_DOCUMENT_ROUTE = '/update-document';
 const DASHBOARD = '/dashboard';
+export const FILE_PREVIEW_ROUTE = '/file-preview';
+
+export const openPreviewTab = (doc) => {
+  const params = new URLSearchParams({
+    id: doc.id,
+    name: doc.fileName,
+    type: doc.fileType || '',
+    url: doc.url || '',
+  });
+  window.open(`${FILE_PREVIEW_ROUTE}?${params.toString()}`, '_blank');
+};
 
 const resolveRoute = (pathname) => {
   if (
@@ -28,12 +40,12 @@ const resolveRoute = (pathname) => {
     pathname === VERSION_DETAIL_ROUTE ||
     pathname === PREVIEW_ROUTE ||
     pathname === UPDATE_DOCUMENT_ROUTE ||
-    pathname === DASHBOARD
+    pathname === DASHBOARD ||
+    pathname === FILE_PREVIEW_ROUTE
   ) {
     return pathname;
   }
   return LOGIN_ROUTE;
-
 };
 
 function App() {
@@ -87,6 +99,9 @@ function App() {
   }
   if (currentRoute === DASHBOARD) {
     return <DashboardPage onLogout={() => navigateTo(LOGIN_ROUTE)} onNavigate={navigateTo} />;
+  }
+  if (currentRoute === FILE_PREVIEW_ROUTE) {
+    return <FilePreviewPage />;
   }
 
   return <LoginPage onSignIn={() => navigateTo(DASHBOARD)} onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)} />;

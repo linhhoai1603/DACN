@@ -1,13 +1,10 @@
 import config from '../config/api';
 import React, { useState, useEffect, useRef } from 'react';
-import { Filter, Download, MoreVertical, RefreshCw, Trash2, FolderArchive, FileText, X } from 'lucide-react';
+import { Filter, Download, MoreVertical, RefreshCw, Trash2, FolderArchive, FileText } from 'lucide-react';
 import DashboardLayout  from "../component/DashboardLayout";
 import { DocumentModel } from "../model/DocumentModel";
-import FilePreview from "../component/FilePreview";
-import "../component/FilePreview.css";
+import { openPreviewTab } from '../App';
 import './DashboardPage.css';
-
-const API_BASE = 'http://localhost:8080';
 
 const formatBytes = (bytes, decimals = 1) => {
     if (!+bytes) return '0 Bytes';
@@ -46,7 +43,6 @@ function DashboardPage({ onNavigate, onLogout }) {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [inputPage, setInputPage] = useState(1);
-    const [previewDoc, setPreviewDoc] = useState(null);
     const menuRef = useRef(null);
 
     // Sync inputPage when currentPage changes via buttons
@@ -100,7 +96,7 @@ function DashboardPage({ onNavigate, onLogout }) {
     const handleView = (e, doc) => {
         e.stopPropagation();
         setOpenMenuId(null);
-        setPreviewDoc(doc);
+        openPreviewTab(doc);
     };
 
     const handleUpdate = (e, doc) => {
@@ -158,7 +154,7 @@ function DashboardPage({ onNavigate, onLogout }) {
                         </thead>
                         <tbody>
                         {documents.map((file) => (
-                            <tr key={file.id} className="clickable-row" onClick={() => setPreviewDoc(file)}>
+                            <tr key={file.id} className="clickable-row" onClick={() => openPreviewTab(file)}>
                                 <td className="file-cell">
                                     <div className="file-type-icon"
                                          style={{backgroundColor: `${getFileColor(file.fileType)}20`, color: getFileColor(file.fileType)}}>
@@ -263,31 +259,6 @@ function DashboardPage({ onNavigate, onLogout }) {
                 </div>
             </section>
         </DashboardLayout>
-
-        {previewDoc && (
-            <div className="preview-overlay" onClick={() => setPreviewDoc(null)}>
-                <div className="preview-modal" onClick={(e) => e.stopPropagation()}>
-                    <div className="preview-modal-header">
-                        <span className="preview-modal-title">{previewDoc.fileName}</span>
-                        <div className="preview-modal-actions">
-                            <a
-                                href={`${API_BASE}/files/${previewDoc.id}/download`}
-                                download={previewDoc.fileName}
-                                className="btn-download-modal"
-                            >
-                                Download
-                            </a>
-                            <button className="btn-close-modal" onClick={() => setPreviewDoc(null)}>
-                                <X size={20} />
-                            </button>
-                        </div>
-                    </div>
-                    <div className="preview-modal-body">
-                        <FilePreview doc={previewDoc} />
-                    </div>
-                </div>
-            </div>
-        )}
         </>
     );
 }

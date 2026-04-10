@@ -5,6 +5,7 @@ import './VersionControl.css';
 import DashboardLayout from "../component/DashboardLayout";
 import FilePreview from "../component/FilePreview";
 import "../component/FilePreview.css";
+import { VERSION_DETAIL_ROUTE } from '../App';
 
 const API_BASE = config.API_BASE_URL;
 

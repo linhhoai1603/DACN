@@ -1,8 +1,15 @@
 import React from 'react';
 import {
-    Search, Bell, HelpCircle, User,
-    File, Users, Star, Trash,
-    FileText, Shield, LogOut, Hexagon
+    Search,
+    Bell,
+    HelpCircle,
+    User,
+    Home,
+    Users,
+    Trash,
+    FileText,
+    LogOut,
+    Hexagon,
 } from 'lucide-react';
 import './DashboardLayout.css';
 
@@ -29,14 +36,11 @@ function DashboardLayout({ children, onNavigate, onLogout, activeTab }) {
                     </section>
 
                     <nav className="menu">
-                        <button type="button" className={`menu-item ${activeTab === 'my-files' ? 'active' : ''}`}>
-                            <File size={18} /> My Files
+                        <button type="button" className={`menu-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => onNavigate('/home')}>
+                            <Home size={18} /> Home
                         </button>
                         <button type="button" className={`menu-item ${activeTab === 'shared' ? 'active' : ''}`}>
                             <Users size={18} /> Shared
-                        </button>
-                        <button type="button" className={`menu-item ${activeTab === 'starred' ? 'active' : ''}`}>
-                            <Star size={18} /> Starred
                         </button>
                         <button type="button" className={`menu-item ${activeTab === 'trash' ? 'active' : ''}`}>
                             <Trash size={18} /> Trash
@@ -48,9 +52,6 @@ function DashboardLayout({ children, onNavigate, onLogout, activeTab }) {
                 </div>
 
                 <div className="sidebar-footer">
-                    <button type="button" className="menu-item">
-                        <Shield size={18} /> Security
-                    </button>
                     <button type="button" className="menu-item" onClick={onLogout}>
                         <LogOut size={18} /> Log Out
                     </button>
@@ -79,7 +80,9 @@ function DashboardLayout({ children, onNavigate, onLogout, activeTab }) {
                 </header>
 
                 {/* TOÀN BỘ NỘI DUNG CÁC TRANG SẼ ĐƯỢC HIỂN THỊ Ở ĐÂY */}
-                {children}
+                <div className="main-content">
+                    {children}
+                </div>
 
             </main>
         </div>

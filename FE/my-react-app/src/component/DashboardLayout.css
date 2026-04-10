@@ -91,7 +91,7 @@
 }
 
 /* Main Panel & Topbar */
-.main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto;}
+/*.main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto;}*/
 
 .topbar {
     height: 64px;
@@ -139,4 +139,22 @@
 .upload-btn {
     background: #003d73; color: white; border: none; padding: 8px 16px;
     border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 14px;
+}
+.main-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    /* quan trọng: để sticky hoạt động ổn định */
+    overflow: hidden;
+}
+
+.main-content {
+    /* đây mới là chỗ scroll */
+    overflow-y: auto;
+    flex: 1;
+
+    /* tạo khoảng cách chuẩn giữa topbar và nội dung */
+    padding: 24px 32px;
+    background-color: #f8fafc;
 }

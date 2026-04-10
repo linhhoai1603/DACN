@@ -73,7 +73,8 @@ function App() {
     return <UploadDashboard onLogout={handleLogout} onNavigate={navigateTo} />;
   }
   if (currentRoute === VERSION_CONTROL_ROUTE) {
-    return <VersionControl onNavigate={navigateTo} onLogout={handleLogout} />;
+    return <VersionControl onLogout={() => navigateTo(LOGIN_ROUTE)} onNavigate={navigateTo} />;
+
   }
   if (currentRoute === VERSION_DETAIL_ROUTE) {
     return <VersionDetail onNavigate={navigateTo} onLogout={handleLogout} />;
@@ -85,7 +86,7 @@ function App() {
     return <UpdateDocument onNavigate={navigateTo} doc={selectedDoc} onLogout={handleLogout} />;
   }
   if (currentRoute === DASHBOARD) {
-    return <DashboardPage onNavigate={navigateTo} onLogout={handleLogout} />;
+    return <DashboardPage onLogout={() => navigateTo(LOGIN_ROUTE)} onNavigate={navigateTo} />;
   }
 
   return <LoginPage onSignIn={() => navigateTo(DASHBOARD)} onNavigateSignUp={() => navigateTo(SIGNUP_ROUTE)} />;

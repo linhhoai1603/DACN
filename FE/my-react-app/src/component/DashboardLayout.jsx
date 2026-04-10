@@ -36,9 +36,6 @@ function DashboardLayout({ children, onNavigate, onLogout, activeTab }) {
                     </section>
 
                     <nav className="menu">
-                        <button type="button" className={`menu-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => onNavigate('/home')}>
-                            <Home size={18} /> Home
-                        </button>
                         <button type="button" className={`menu-item ${activeTab === 'shared' ? 'active' : ''}`}>
                             <Users size={18} /> Shared
                         </button>

@@ -1,11 +1,9 @@
 import config from '../config/api';
 import { useEffect, useRef, useState } from 'react';
-import { FileText, ListFilter, MoreHorizontal, X } from 'lucide-react';
+import { FileText, ListFilter, MoreHorizontal } from 'lucide-react';
 import './VersionControl.css';
 import DashboardLayout from "../component/DashboardLayout";
-import FilePreview from "../component/FilePreview";
-import "../component/FilePreview.css";
-import { VERSION_DETAIL_ROUTE } from '../App';
+import { VERSION_DETAIL_ROUTE, openPreviewTab } from '../App';
 
 const API_BASE = config.API_BASE_URL;
 
@@ -14,8 +12,7 @@ const VersionControl = ({ onNavigate, onLogout }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [openMenuId, setOpenMenuId] = useState(null);
-    const [sortOrder, setSortOrder] = useState('desc'); // 'desc' = mới nhất trước
-    const [previewDoc, setPreviewDoc] = useState(null); // doc being previewed
+    const [sortOrder, setSortOrder] = useState('desc');
     const menuRef = useRef(null);
 
     useEffect(() => {
@@ -77,7 +74,7 @@ const VersionControl = ({ onNavigate, onLogout }) => {
     const handleView = (e, doc) => {
         e.stopPropagation();
         setOpenMenuId(null);
-        setPreviewDoc(doc);
+        openPreviewTab(doc);
     };
 
     const handleUpdate = (e, doc) => {
@@ -87,8 +84,7 @@ const VersionControl = ({ onNavigate, onLogout }) => {
     };
 
     return (
-        <>
-            <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="version-control">
+        <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="version-control">
                 <div className="content-header">
                     <div className="title-section">
                         <h1>Document Management System</h1>
@@ -186,36 +182,6 @@ const VersionControl = ({ onNavigate, onLogout }) => {
                     )}
                 </div>
             </DashboardLayout>
-
-            {/* Preview Modal */}
-            {previewDoc && (() => {
-                return (
-                    <div className="preview-overlay" onClick={() => setPreviewDoc(null)}>
-                        <div className="preview-modal" onClick={(e) => e.stopPropagation()}>
-                            <div className="preview-modal-header">
-                                <span className="preview-modal-title">{previewDoc.fileName}</span>
-                                <div className="preview-modal-actions">
-                                    <a
-                                        href={`${API_BASE}/files/${previewDoc.id}/download`}
-                                        download={previewDoc.fileName}
-                                        className="btn-download-modal"
-                                    >
-                                        Download
-                                    </a>
-                                    <button className="btn-close-modal" onClick={() => setPreviewDoc(null)}>
-                                        <X size={20} />
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="preview-modal-body">
-                                <FilePreview doc={previewDoc} />
-                            </div>
-                        </div>
-                    </div>
-                )
-            })
-            };
-        </>
     );
 };
 

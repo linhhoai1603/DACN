@@ -1,0 +1,58 @@
+.fpp-root {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #f1f5f9;
+    font-family: 'Inter', sans-serif;
+}
+
+.fpp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: #1e293b;
+    color: #f8fafc;
+    flex-shrink: 0;
+}
+
+.fpp-title {
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 140px);
+}
+
+.fpp-btn-download {
+    padding: 6px 16px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.fpp-btn-download:hover {
+    background: #2563eb;
+}
+
+.fpp-body {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    padding: 24px;
+}
+
+.fpp-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-size: 16px;
+    color: #64748b;
+}

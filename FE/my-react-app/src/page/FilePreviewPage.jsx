@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import FilePreview from '../component/FilePreview';
+import config from '../config/api';
 import '../component/FilePreview.css';
 import './FilePreviewPage.css';
 
@@ -32,7 +33,7 @@ const FilePreviewPage = () => {
             <div className="fpp-header">
                 <span className="fpp-title">{doc.fileName}</span>
                 <a
-                    href={`http://localhost:8080/files/${doc.id}/download`}
+                    href={`${config.API_BASE_URL}/files/${doc.id}/download`}
                     download={doc.fileName}
                     className="fpp-btn-download"
                 >

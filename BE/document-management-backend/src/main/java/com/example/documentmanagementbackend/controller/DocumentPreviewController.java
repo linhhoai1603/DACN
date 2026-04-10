@@ -44,6 +44,11 @@ public class DocumentPreviewController {
         return ResponseEntity.ok(documentService.countDocuments());
     }
 
+    @GetMapping(value = "/search", params = {"keyword"})
+    public ResponseEntity<List<DocumentMetadataResponse>> searchDocument(@RequestParam String keyword) {
+        return ResponseEntity.ok(documentService.searchDocuments(keyword));
+    }
+
     // GET /files/{id} — lấy metadata + previewUrl của một document
     @GetMapping("/{id}")
     public ResponseEntity<DocumentMetadataResponse> getDocumentById(@PathVariable Long id) {

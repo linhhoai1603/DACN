@@ -32,6 +32,14 @@ public class DocumentServiceImpl implements DocumentService {
         return metadataRepository.count();
     }
 
+    @Override
+    public List<DocumentMetadataResponse> searchDocuments(String keyword) {
+        return metadataRepository.searchLatestDocumentMetadataByKeyword(keyword)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     private DocumentMetadataResponse toResponse(DocumentMetadataNativeResponse doc) {
         String fileType = getExtension(doc.getFileName());
         String previewUrl = buildPreviewUrl(fileType, doc.getId());

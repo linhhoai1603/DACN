@@ -1,10 +1,13 @@
 import config from '../config/api';
 import React, { useState, useEffect, useRef } from 'react';
-import { Filter, Download, MoreVertical, RefreshCw, Trash2, FolderArchive, FileText } from 'lucide-react';
+import { Filter, Download, MoreVertical, RefreshCw, Trash2, FolderArchive, FileText, X } from 'lucide-react';
 import DashboardLayout  from "../component/DashboardLayout";
 import { DocumentModel } from "../model/DocumentModel";
-import { openPreviewTab } from '../App';
+import FilePreview from "../component/FilePreview";
+import "../component/FilePreview.css";
 import './DashboardPage.css';
+
+const API_BASE = 'http://localhost:8080';
 
 const formatBytes = (bytes, decimals = 1) => {
     if (!+bytes) return '0 Bytes';
@@ -39,10 +42,12 @@ const getFileColor = (type) => {
 
 function DashboardPage({ onNavigate, onLogout }) {
     const [documents, setDocuments] = useState([]);
+    const [searchResults, setSearchResults] = useState(null);
     const [openMenuId, setOpenMenuId] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [inputPage, setInputPage] = useState(1);
+    const [previewDoc, setPreviewDoc] = useState(null);
     const menuRef = useRef(null);
 
     // Sync inputPage when currentPage changes via buttons
@@ -52,6 +57,7 @@ function DashboardPage({ onNavigate, onLogout }) {
 
     // Fetch total document count to calculate total pages
     useEffect(() => {
+        if (searchResults !== null) return; // Không gọi API count nếu đang hiển thị search
         fetch(`${config.API_BASE_URL}/files/count`)
             .then(res => res.json())
             .then(data => {
@@ -61,9 +67,12 @@ function DashboardPage({ onNavigate, onLogout }) {
                 setTotalPages(calculatedPages > 0 ? calculatedPages : 1);
             })
             .catch(err => console.error('Error fetching document count:', err));
-    }, []);
+    }, [searchResults]);
 
     useEffect(() => {
+        // Nếu ô search có kết quả thì không gọi API get documents
+        if (searchResults !== null) return;
+        
         // Fetch files from API based on currentPage
         fetch(`${config.API_BASE_URL}/files?page=${currentPage}&index=10`)
             .then(res => res.json())
@@ -76,7 +85,7 @@ function DashboardPage({ onNavigate, onLogout }) {
                 setDocuments(mappedDocuments);
             })
             .catch(err => console.error('Error fetching documents:', err));
-    }, [currentPage]);
+    }, [currentPage, searchResults]);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -96,7 +105,7 @@ function DashboardPage({ onNavigate, onLogout }) {
     const handleView = (e, doc) => {
         e.stopPropagation();
         setOpenMenuId(null);
-        openPreviewTab(doc);
+        setPreviewDoc(doc);
     };
 
     const handleUpdate = (e, doc) => {
@@ -124,7 +133,7 @@ function DashboardPage({ onNavigate, onLogout }) {
 
     return (
         <>
-        <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="dashboard">
+        <DashboardLayout onNavigate={onNavigate} onLogout={onLogout} activeTab="dashboard" onSearchResults={setSearchResults}>
             <section className="content">
                 <div className="content-header-row">
                     <div>
@@ -153,112 +162,147 @@ function DashboardPage({ onNavigate, onLogout }) {
                         </tr>
                         </thead>
                         <tbody>
-                        {documents.map((file) => (
-                            <tr key={file.id} className="clickable-row" onClick={() => openPreviewTab(file)}>
-                                <td className="file-cell">
-                                    <div className="file-type-icon"
-                                         style={{backgroundColor: `${getFileColor(file.fileType)}20`, color: getFileColor(file.fileType)}}>
-                                        {file.fileType?.toUpperCase() === 'ZIP' ? <FolderArchive size={20} /> : <FileText size={20} />}
-                                    </div>
-                                    <div>
-                                        <div className="file-name-text">{file.fileName}</div>
-                                        <div className="file-sub-text">{formatBytes(file.fileSize)} • {file.fileType ? file.fileType.toUpperCase() : 'FILE'}</div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="commit-info">
-                                        <span className="dot-status"></span>
-                                        {file.commitMessage}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="uploader-info">
-                                        <div className="mini-avatar">{file.uploadedBy ? file.uploadedBy.charAt(0).toUpperCase() : '?'}</div>
-                                        {file.uploadedBy}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="time-info">
-                                        <strong>{formatDate(file.uploadedAt)}</strong>
-                                        <span>• {formatTime(file.uploadedAt)}</span>
-                                    </div>
-                                </td>
-                                <td className="actions-cell">
-                                    <div className="action-menu-container" ref={openMenuId === file.id ? menuRef : null}>
-                                        <button
-                                            className="action-dot-btn"
-                                            onClick={(e) => toggleMenu(e, file.id)}
-                                        >
-                                            <MoreVertical size={20} />
-                                        </button>
-
-                                        {openMenuId === file.id && (
-                                            <div className="dropdown-menu">
-                                                <button className="menu-option" onClick={(e) => handleView(e, file)}>
-                                                    <FileText size={14} /> View
-                                                </button>
-                                                <button className="menu-option" onClick={(e) => handleUpdate(e, file)}>
-                                                    <RefreshCw size={14} /> Update
-                                                </button>
-                                                <button className="menu-option delete" onClick={(e) => e.stopPropagation()}>
-                                                    <Trash2 size={14} /> Delete
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
+                        {searchResults && searchResults.length === 0 ? (
+                            <tr>
+                                <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                                    Không có kết quả tìm kiếm nào phù hợp.
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            (searchResults || documents).map((file) => (
+                                <tr key={file.id} className="clickable-row" onClick={() => setPreviewDoc(file)}>
+                                    <td className="file-cell">
+                                        <div className="file-type-icon"
+                                             style={{backgroundColor: `${getFileColor(file.fileType)}20`, color: getFileColor(file.fileType)}}>
+                                            {file.fileType?.toUpperCase() === 'ZIP' ? <FolderArchive size={20} /> : <FileText size={20} />}
+                                        </div>
+                                        <div>
+                                            <div className="file-name-text">{file.fileName}</div>
+                                            <div className="file-sub-text">{formatBytes(file.fileSize)} • {file.fileType ? file.fileType.toUpperCase() : 'FILE'}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="commit-info">
+                                            <span className="dot-status"></span>
+                                            {file.commitMessage}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="uploader-info">
+                                            <div className="mini-avatar">{file.uploadedBy ? file.uploadedBy.charAt(0).toUpperCase() : '?'}</div>
+                                            {file.uploadedBy}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="time-info">
+                                            <strong>{formatDate(file.uploadedAt)}</strong>
+                                            <span>• {formatTime(file.uploadedAt)}</span>
+                                        </div>
+                                    </td>
+                                    <td className="actions-cell">
+                                        <div className="action-menu-container" ref={openMenuId === file.id ? menuRef : null}>
+                                            <button
+                                                className="action-dot-btn"
+                                                onClick={(e) => toggleMenu(e, file.id)}
+                                            >
+                                                <MoreVertical size={20} />
+                                            </button>
+
+                                            {openMenuId === file.id && (
+                                                <div className="dropdown-menu">
+                                                    <button className="menu-option" onClick={(e) => handleView(e, file)}>
+                                                        <FileText size={14} /> View
+                                                    </button>
+                                                    <button className="menu-option" onClick={(e) => handleUpdate(e, file)}>
+                                                        <RefreshCw size={14} /> Update
+                                                    </button>
+                                                    <button className="menu-option delete" onClick={(e) => e.stopPropagation()}>
+                                                        <Trash2 size={14} /> Delete
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                         </tbody>
                     </table>
                 </div>
 
-                <div className="pagination-wrapper">
-                    <button 
-                        className="pagination-btn"
-                        onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))} 
-                        disabled={currentPage === 0}
-                    >
-                        &lt;
-                    </button>
-                    <div className="pagination-divider"></div>
-                    <span className="pagination-current">{currentPage + 1}</span>
-                    <div className="pagination-divider"></div>
-                    <button 
-                        className="pagination-btn"
-                        onClick={() => setCurrentPage(prev => prev + 1)} 
-                        disabled={currentPage >= totalPages - 1}
-                    >
-                        &gt;
-                    </button>
-                    
-                    <div style={{ display: 'flex', alignItems: 'center', marginLeft: '20px', gap: '8px' }}>
-                        <label htmlFor="pageInput" style={{ fontSize: '14px', color: '#64748b' }}>Page:</label>
-                        <input 
-                            id="pageInput"
-                            type="number"
-                            min="1"
-                            step="1"
-                            style={{ width: '60px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center' }}
-                            value={inputPage}
-                            onChange={(e) => {
-                                const val = e.target.value;
-                                if (val === '' || /^[1-9]\d*$/.test(val)) {
-                                    setInputPage(val);
-                                }
-                            }}
-                            onKeyDown={handlePageInputKeyDown}
-                        />
+                {!searchResults && (
+                    <div className="pagination-wrapper">
                         <button 
-                            style={{ padding: '4px 12px', borderRadius: '4px', border: 'none', backgroundColor: '#3b82f6', color: 'white', cursor: 'pointer' }}
-                            onClick={handlePageInputSubmit}
+                            className="pagination-btn"
+                            onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))} 
+                            disabled={currentPage === 0}
                         >
-                            Go
+                            &lt;
                         </button>
+                        <div className="pagination-divider"></div>
+                        <span className="pagination-current">{currentPage + 1}</span>
+                        <div className="pagination-divider"></div>
+                        <button 
+                            className="pagination-btn"
+                            onClick={() => setCurrentPage(prev => prev + 1)} 
+                            disabled={currentPage >= totalPages - 1}
+                        >
+                            &gt;
+                        </button>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', marginLeft: '20px', gap: '8px' }}>
+                            <label htmlFor="pageInput" style={{ fontSize: '14px', color: '#64748b' }}>Page:</label>
+                            <input 
+                                id="pageInput"
+                                type="number"
+                                min="1"
+                                step="1"
+                                style={{ width: '60px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center' }}
+                                value={inputPage}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === '' || /^[1-9]\d*$/.test(val)) {
+                                        setInputPage(val);
+                                    }
+                                }}
+                                onKeyDown={handlePageInputKeyDown}
+                            />
+                            <button 
+                                style={{ padding: '4px 12px', borderRadius: '4px', border: 'none', backgroundColor: '#3b82f6', color: 'white', cursor: 'pointer' }}
+                                onClick={handlePageInputSubmit}
+                            >
+                                Go
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
             </section>
         </DashboardLayout>
+
+        {previewDoc && (
+            <div className="preview-overlay" onClick={() => setPreviewDoc(null)}>
+                <div className="preview-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="preview-modal-header">
+                        <span className="preview-modal-title">{previewDoc.fileName}</span>
+                        <div className="preview-modal-actions">
+                            <a
+                                href={`${API_BASE}/files/${previewDoc.id}/download`}
+                                download={previewDoc.fileName}
+                                className="btn-download-modal"
+                            >
+                                Download
+                            </a>
+                            <button className="btn-close-modal" onClick={() => setPreviewDoc(null)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="preview-modal-body">
+                        <FilePreview doc={previewDoc} />
+                    </div>
+                </div>
+            </div>
+        )}
         </>
     );
 }

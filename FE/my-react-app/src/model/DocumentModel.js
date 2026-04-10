@@ -15,4 +15,19 @@ export class DocumentModel {
         this.fileType = data.fileType || '';
         this.previewUrl = data.previewUrl || '';
     }
+
+    /**
+     * Map a single API response object to DocumentModel
+     */
+    static fromApiResponse(data) {
+        return new DocumentModel(data);
+    }
+
+    /**
+     * Map an array of API response objects to an array of DocumentModels
+     */
+    static fromApiResponseList(dataList) {
+        if (!Array.isArray(dataList)) return [];
+        return dataList.map(item => this.fromApiResponse(item));
+    }
 }

@@ -5,6 +5,7 @@ import com.example.documentmanagementbackend.service.UserRepositoryDetailsServic
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,9 +39,10 @@ public class SecurityConfig {
                         .contentSecurityPolicy(csp -> csp.policyDirectives("frame-ancestors *"))
                 )
                 .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/files/upload").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/files", "/files/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/files", "/files/**").permitAll()
                         .anyRequest().authenticated()
                 ).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
@@ -53,11 +55,19 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000", "https://dacn-alpha.vercel.app")); // không dùng "*"
+        config.setAllowedOriginPatterns(List.of(
+            "http://localhost:*",
+            "http://127.0.0.1:*",
+            "https://dacn-alpha.vercel.app",
+            "https://*.vercel.app",
+            "http://54.84.136.166:*",
+            "https://54.84.136.166:*"
+        ));
         config.setAllowCredentials(true);
         config.setAllowedMethods(List.of("GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"));
-        config.setAllowedHeaders(List.of("Content-Type", "Authorization"));
-        config.setExposedHeaders(List.of("Set-Cookie"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Set-Cookie", "Authorization"));
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

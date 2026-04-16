@@ -40,7 +40,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/files/upload").permitAll()
                     .requestMatchers(HttpMethod.GET, "/files", "/files/**").permitAll()
                         .anyRequest().authenticated()
@@ -55,14 +55,7 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of(
-            "http://localhost:*",
-            "http://127.0.0.1:*",
-            "https://dacn-alpha.vercel.app",
-            "https://*.vercel.app",
-            "http://54.84.136.166:*",
-            "https://54.84.136.166:*"
-        ));
+        config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowCredentials(true);
         config.setAllowedMethods(List.of("GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"));
         config.setAllowedHeaders(List.of("*"));

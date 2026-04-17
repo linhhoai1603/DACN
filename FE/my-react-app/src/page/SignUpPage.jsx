@@ -12,6 +12,7 @@ const SignUpPage = ({ onNavigate }) => {
         phoneNumber: '',  // phải khớp với BE: phoneNumber
         password: '',
         address: '',
+        role: 'EMPLOYEE',
     });
     const [showPass, setShowPass] = useState(false);
     const [errors, setErrors] = useState({});
@@ -184,6 +185,26 @@ const SignUpPage = ({ onNavigate }) => {
                                         onChange={handleChange}
                                     />
                                 </div>
+                            </div>
+
+                            {/* Role */}
+                            <div className="input-group">
+                                <label>Role</label>
+                                <div className="input-wrapper">
+                                    <User className="icon-left" size={18} />
+                                    <select
+                                        name="role"
+                                        className="input-field"
+                                        value={form.role}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        <option value="ADMIN">Admins</option>
+                                        <option value="DIRECTOR">Director</option>
+                                        <option value="EMPLOYEE">Employee</option>
+                                    </select>
+                                </div>
+                                {errors.role && <span className="field-error">{errors.role}</span>}
                             </div>
 
                             {/* Password */}

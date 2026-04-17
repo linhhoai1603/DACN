@@ -54,7 +54,11 @@ public class AuthServiceImpl implements AuthService {
         newUser.setPhone(request.getPhoneNumber());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setAddress(request.getAddress());
-        newUser.setRole(Role.USERS);
+        try {
+            newUser.setRole(Role.fromSignupValue(request.getRole()));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
 
         userRepository.save(newUser);
         String token = jwtService.generateToken(newUser);
